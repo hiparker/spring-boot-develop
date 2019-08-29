@@ -132,7 +132,7 @@
         }
         // 是否显示列选项
         if (self.options.showColumns) {
-            var $columns_div = $('<div class="btn-group pull-right" title="列"><button type="button" aria-label="columns" class="btn btn-default btn-outline dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="'+self.options.toolColumnsClass+'"></i> <span class="caret"></span></button></div>');
+            var $columns_div = $('<div class="btn-group pull-right" title="列"><button type="button" aria-label="columns" class="btn btn-default btn-outline dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="'+self.options.toolColumnsClass+'"></i><span class="caret"></span></button></div>');
             var $columns_ul = $('<ul class="dropdown-menu dropdown-menu-right columns" role="menu"></ul>');
             // 固定列不能隐藏
             $.each(self.leftFixedColumns, function(i, column) {
@@ -472,7 +472,7 @@
         $tbody.append($tr);
         if (_ls) {
             $.each(_ls, function(i, item) {
-                var _child_row_id = row_id + "_" + i
+                var _child_row_id = row_id + "_" + i;
                 self.recursionNode(item, (lv + 1), _child_row_id, row_id)
             });
         }
@@ -544,11 +544,11 @@
                 }
                 // 增加formatter渲染
                 if (column.formatter) {
-                    $td.html(column.formatter.call(self, item[column.field] == null?"":item[column.field], item, index));
+                    $td.html(column.formatter.call(self,item[column.field] == null?"":item[column.field], item, index));
                 } else {
                     if (self.options.showTitle) {
                         // 只在字段没有formatter时才添加title属性
-                        $td.attr("title", item[column.field]);
+                        $td.attr("title", item[column.field] == null?"":item[column.field]);
                     }
                     $td.text(item[column.field] == null?"":item[column.field]);
                 }

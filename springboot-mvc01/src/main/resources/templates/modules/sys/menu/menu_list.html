@@ -75,10 +75,10 @@
                         field: 'name',
                         width: '20%',
                         formatter: function(value,row, index) {
-                            if (row.icon == null || row == "") {
+                            if ( undefined == row.icon || null == row.icon ||  "" == row.icon) {
                                 return row.name;
                             } else {
-                                return '<i class="' + row.icon + '"></i> <span class="nav-label">' + row.name + '</span>';
+                                return '<i class="' + row.icon + '" style="margin-right: 4px"></i><span class="nav-label">' + row.name + '</span>';
                             }
                         }
                     },
@@ -102,14 +102,14 @@
                         width: '10%',
                         align: "left",
                         valign: "top",
-                        formatter: function(value,item, index) {
-                            if (item.type == '0') {
+                        formatter: function(value,row, index) {
+                            if (row.type == '0') {
                                 return '<span class="label label-success">目录</span>';
                             }
-                            else if (item.type == '1') {
+                            else if (row.type == '1') {
                                 return '<span class="label label-primary">菜单</span>';
                             }
-                            else if (item.type == '2') {
+                            else if (row.type == '2') {
                                 return '<span class="label label-warning">按钮</span>';
                             }
                         }
@@ -121,6 +121,8 @@
                         align: "left",
                         visible: false,
                         formatter: function(value,row, index) {
+                            // TODO isShow 名称关键词 重复
+
                             return value;
                         }
                     },
@@ -128,7 +130,7 @@
                         field: 'permission',
                         title: '权限标识',
                         width: '15%',
-                        align: "left",
+                        align: "left"
                     },
                     {
                         title: '操作',
