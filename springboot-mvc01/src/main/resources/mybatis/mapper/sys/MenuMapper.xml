@@ -5,22 +5,22 @@
 	<sql id="menuColumns">
 		a.id,
 		a.parent_id AS "parent.id",
-		a.parent_ids,
-		a.name,
-		a.href,
-		a.target,
-		a.icon,
-		a.sort,
-		a.is_show,
-		a.menu_type,
-		a.permission,
-		a.remarks,
+		a.parent_id AS "parentId",
+		a.parent_ids AS "parentIds",
+		a.name AS "name",
+		a.href AS "href",
+		a.target AS "target",
+		a.icon AS "icon",
+		a.sort AS "sort",
+		a.is_show AS "isShow",
+		a.menu_type AS "type",
+		a.permission AS "permission",
+		a.remarks AS "remarks",
 		a.create_by AS "createBy.id",
-		a.create_date,
+		a.create_date AS "createDate",
 		a.update_by AS "updateBy.id",
-		a.update_date,
-		a.del_flag,
-		p.name AS "parent.name"
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag"
 	</sql>
 
     <sql id="menuJoins">

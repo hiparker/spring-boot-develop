@@ -21,6 +21,7 @@ public class Menu extends DataEntity<Menu> {
 	private static final long serialVersionUID = 1L;
 
 	private Menu parent;	// 父级菜单
+    private String parentId; // 父级编号
 	private String parentIds; // 所有父级编号
 	private List<Menu> children;	// 父级菜单
 	private String name; 	// 名称
@@ -126,9 +127,7 @@ public class Menu extends DataEntity<Menu> {
 		this.permission = permission;
 	}
 
-	public String getParentId() {
-		return parent != null && parent.getId() != null ? parent.getId() : "0";
-	}
+
 
 	@Override
 	public String toString() {
@@ -150,4 +149,13 @@ public class Menu extends DataEntity<Menu> {
 	public void setType(String type) {
 		this.type = type;
 	}
+
+
+    public String getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
 }

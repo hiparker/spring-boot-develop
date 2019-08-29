@@ -2,7 +2,7 @@
 <html  lang="zh" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
-    <title>菜单</title>
+    <title>菜单列表</title>
     <script th:src="@{/plugin/jquery/jquery-2.0.0.min.js}"></script>
     <link rel="stylesheet" th:href="@{/plugin/bootstrap/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/plugin/bootstrap/css/bootstrap-theme.min.css}">
@@ -11,12 +11,10 @@
     <link rel="stylesheet" th:href="@{/common/css/app-blue.css}">
     <script th:src="@{/plugin/bootstrap/js/bootstrap.min.js}"></script>
     <script type="text/javascript" th:src="@{/plugin/bootstrap-treetable/bootstrap-treetable.js}"></script>
-    <style>
-        html,body{
-            background-color: #ecf0f1;
-        }
 
-    </style>
+    <!-- 图标库 -->
+    <link rel="stylesheet" th:href="@{/plugin/font-awesome/css/font-awesome.min.css}">
+
 </head>
 <body>
 <div id="demo-toolbar"  class="btn-group btn-group-toggle" data-toggle="buttons">
@@ -39,8 +37,6 @@
         </div>
     </div>
 
-<!-- 全局js -->
-<!--<script type="text/javascript" src="./libs/v4/popper.min.js"></script>-->
 
 <script type="text/javascript">
 /**
@@ -61,23 +57,33 @@
                 var treeTable = $('#demo').bootstrapTreeTable({
                     toolbar: "#demo-toolbar",    //顶部工具条
                     expandColumn : 1,            // 在哪一列上面显示展开按钮
-                    columns: [{
+                    expanderExpandedClass : "fa fa-angle-down",
+                    expanderCollapsedClass : "fa fa-angle-right",
+                    parentId:"parentId",
+                    ajaxParams:{},
+                    type:"get",
+                    url:"/a/menu/data",
+                    columns: [
+                     //  selectItem 必填 如果不需要多选 就用 radio
+                     {
                         field: 'selectItem',
-                        radio: true
-                     },{
+                        radio: true,
+                        visible: false
+                     },
+                     {
                         title: '菜单名称',
-                        field: 'menuName',
+                        field: 'name',
                         width: '20%',
                         formatter: function(value,row, index) {
                             if (row.icon == null || row == "") {
-                                return row.menuName;
+                                return row.name;
                             } else {
-                                return '<i class="' + row.icon + '"></i> <span class="nav-label">' + row.menuName + '</span>';
+                                return '<i class="' + row.icon + '"></i> <span class="nav-label">' + row.name + '</span>';
                             }
                         }
                     },
                     {
-                        field: 'orderNum',
+                        field: 'sort',
                         title: '排序',
                         width: '10%',
                         align: "left",
@@ -85,31 +91,31 @@
                         visible: true
                     },
                     {
-                        field: 'url',
+                        field: 'href',
                         title: '请求地址',
                         width: '15%',
-                        align: "left"
+                        align: "href"
                     },
                     {
                         title: '类型',
-                        field: 'menuType',
+                        field: 'type',
                         width: '10%',
                         align: "left",
                         valign: "top",
                         formatter: function(value,item, index) {
-                            if (item.menuType == 'M') {
+                            if (item.type == '0') {
                                 return '<span class="label label-success">目录</span>';
                             }
-                            else if (item.menuType == 'C') {
+                            else if (item.type == '1') {
                                 return '<span class="label label-primary">菜单</span>';
                             }
-                            else if (item.menuType == 'F') {
+                            else if (item.type == '2') {
                                 return '<span class="label label-warning">按钮</span>';
                             }
                         }
                     },
                     {
-                        field: 'visible',
+                        field: 'isShow',
                         title: '可见',
                         width: '10%',
                         align: "left",
@@ -119,7 +125,7 @@
                         }
                     },
                     {
-                        field: 'perms',
+                        field: 'permission',
                         title: '权限标识',
                         width: '15%',
                         align: "left",
@@ -135,8 +141,8 @@
                             actions.push('<a class="btn btn-danger btn-xs " href="#" ><i class="fa fa-remove"></i>删除</a>');
                             return actions.join('');
                         }
-                    }],
-                    data:[{
+                    }]
+                    /*,data:[{
                         "searchValue": null,
                         "createBy": "admin",
                         "createTime": "2018-03-16 11:33:00",
@@ -1180,7 +1186,7 @@
                         "visible": 0,
                         "perms": "monitor:logininfor:remove",
                         "icon": "#"
-                    }]
+                    }]*/
                 });
                 $("#selectBtn").click(function(){
                     var selecteds = $('#demo').bootstrapTreeTable('getSelections');
@@ -1188,7 +1194,7 @@
                         console.log(_item);
                     });
                     alert("看console");
-                })
+                });
                 $("#addBtn").click(function(){
                     var data = [{
                         "searchValue": null,
@@ -1372,10 +1378,10 @@
                         "icon": "#"
                     }];
                     $('#demo').bootstrapTreeTable('appendData',data);
-                })
+                });
                 $("#expandRowBtn").click(function(){
                     $('#demo').bootstrapTreeTable('toggleRow',1);
-                })
+                });
                 var _expandFlag_all = false;
                 $("#expandAllBtn").click(function(){
                     if(_expandFlag_all){
@@ -1384,7 +1390,7 @@
                         $('#demo').bootstrapTreeTable('collapseAll');
                     }
                     _expandFlag_all = _expandFlag_all?false:true;
-                })
+                });
                 var _showFlag = true;
                 $("#showColumnBtn").click(function(){
                     if(_showFlag){
@@ -1393,10 +1399,10 @@
                         $('#demo').bootstrapTreeTable('showColumn',"orderNum");
                     }
                     _showFlag = _showFlag?false:true;
-                })
+                });
                 $("#destroyBtn").click(function(){
                     $('#demo').bootstrapTreeTable('destroy');
-                })
+                });
 </script>
 </body>
 </html>

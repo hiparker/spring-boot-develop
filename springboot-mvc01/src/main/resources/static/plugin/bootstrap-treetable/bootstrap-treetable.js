@@ -1,8 +1,7 @@
 /**
  * bootstrap-treetable
  * v1.0.10-beta
- * @author swifly
- * @url https://gitee.com/cyf783/bootstrap-treetable/
+ * @author Edwin
  */
 (function($) {
     "use strict";
@@ -23,7 +22,7 @@
         this.expandColumnIsFixed = false;//展开列是否是固定列
         this.hasFixedColumn = false;//是否存在固定列
         this.selectedDataIds = [];//已选记录集合
-        this.expandColumnField = null//展开列的字段名
+        this.expandColumnField = null;//展开列的字段名
         this.init();//初始化
     };
     // 初始化
@@ -44,6 +43,7 @@
     // 初始化配置
     BootstrapTreeTable.prototype.initOptions = function() {
         var self = this;
+
         $.each(self.options.columns, function(i, column) {
             column = $.extend({}, BootstrapTreeTable.COLUMN_DEFAULTS, column);
             if(column.width){
@@ -232,7 +232,7 @@
                     var _errorMsg = '<tr><td colspan="' + self.options.columns.length + '"><div style="display: block;text-align: center;">' + res.responseText + '</div></td></tr>'
                     $tbody.html(_errorMsg);
                     self.trigger('load-error', textStatus, res);
-                },
+                }
             });
         } else {
             if(self.options.data){
@@ -510,12 +510,18 @@
             // 判断是不是选择列
             if (column.checkbox || column.radio) {
                 var $td = $('<td style="text-align:center;width:36px"></td>');
+
+                var display = "";
+                if(null == column.visible || !column.visible){
+                    display = "display:none"
+                }
+
                 if (column.radio) {
-                    var $ipt = $('<input name="select_item" type="radio" value="' + item[self.options.id] + '"></input>');
+                    var $ipt = $('<input name="select_item" type="radio" value="' + item[self.options.id] + '" style="'+display+'"/>');
                     $td.append($ipt);
                 }
                 if (column.checkbox) {
-                    var $ipt = $('<input name="select_item" type="checkbox" value="' + item[self.options.id] + '"></input>');
+                    var $ipt = $('<input name="select_item" type="checkbox" value="' + item[self.options.id] + '" style="'+display+'"/>');
                     $td.append($ipt);
                 }
                 $tr.append($td);
@@ -538,14 +544,15 @@
                 }
                 // 增加formatter渲染
                 if (column.formatter) {
-                    $td.html(column.formatter.call(self, item[column.field], item, index));
+                    $td.html(column.formatter.call(self, item[column.field] == null?"":item[column.field], item, index));
                 } else {
                     if (self.options.showTitle) {
                         // 只在字段没有formatter时才添加title属性
                         $td.attr("title", item[column.field]);
                     }
-                    $td.text(item[column.field]);
+                    $td.text(item[column.field] == null?"":item[column.field]);
                 }
+
                 if (self.expandColumnField == column.field) {
                     if (!isP) {
                         $td.prepend('<span class="treetable-expander"></span>')
@@ -1121,7 +1128,7 @@
         width: undefined,
         visible: true,
         fixed:undefined,//固定列。可选值有：left（固定在左）。一旦设定，对应的列将会被固定在左，不随滚动条而滚动。
-        formatter: undefined,
+        formatter: undefined
     };
 
     $.fn.bootstrapTreeTable = function(option) {
