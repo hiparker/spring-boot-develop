@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edwin.practive.springbootmvc01.modules.sys.mapper.UserMapper">
+    
+    <sql id="userColumns">
+        a.id AS "id",
+        a.user_name AS "name",
+        a.code AS "code",
+        a.account AS "account",
+        a.password AS "password",
+        a.tel AS "tel",
+
+        a.is_useable AS "isUseable",
+        a.sysversion AS "sysversion",
+        a.create_by AS "createBy.id",
+        a.create_date AS "createDate",
+        a.update_by AS "updateBy.id",
+        a.update_date AS "updateDate",
+        a.del_flag AS "delFlag",
+        a.remarks AS "remarks"
+    </sql>
+
+    <sql id="userJoins">
+
+    </sql>
+
+
+    <select id="get" resultType="User"  >
+        SELECT
+        <include refid="userColumns"/>
+        FROM sys_user a
+        <include refid="userJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="validataLogin" resultType="User"  >
+        SELECT
+        <include refid="userColumns"/>
+        FROM sys_user a
+        <include refid="userJoins"/>
+        WHERE a.account = #{account} and password = #{password}
+    </select>
+
+
+    <select id="findList" resultType="User" >
+        SELECT
+        <include refid="userColumns"/>
+        FROM sys_user a
+        <include refid="userJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="code != null and code != ''">
+                AND a.code = #{code}
+            </if>
+            <if test="account != null and account != ''">
+                AND a.account = #{account}
+            </if>
+            <if test="password != null and password != ''">
+                AND a.password = #{password}
+            </if>
+
+            <if test="name != null and name != ''">
+                AND a.user_name LIKE
+                <if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+            </if>
+        </where>
+    </select>
+
+    <select id="findAllList" resultType="User"  >
+        SELECT
+        <include refid="userColumns"/>
+        FROM airline_ticket_order a
+        <include refid="userJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO sys_user(
+            id,
+            user_name,
+            code,
+            account,
+            password,
+            tel,
+            is_useable,
+            sysversion,
+            create_by,
+            create_date,
+            update_by,
+            update_date,
+            del_flag,
+            remarks
+        ) VALUES (
+            #{id},
+            #{name},
+            #{code},
+            #{account},
+            #{password},
+            #{tel},
+            #{isUseable},
+            0,
+            #{createBy},
+            #{createDate},
+            #{updateBy},
+            #{updateDate},
+            #{delFlag},
+            #{remarks}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE sys_user SET
+        user_name = #{name},
+        code = #{code},
+        account = #{account},
+        password = #{password},
+        tel = #{tel},
+        is_useable = #{isUseable},
+        sysversion = sysversion+1,
+        update_by = #{updateBy},
+        update_date = #{updateDate},
+        remarks = #{remarks}
+        WHERE id = #{id}
+        <if test="sysversion != null">
+            AND sysversion = #{sysversion}
+        </if>
+    </update>
+
+
+    <update id="updatePassword">
+        UPDATE sys_user SET
+        password = #{password},
+        sysversion = sysversion+1,
+        update_by = #{updateBy},
+        update_date = #{updateDate}
+        WHERE id = #{id}
+        <if test="sysversion != null">
+            AND sysversion = #{sysversion}
+        </if>
+    </update>
+
+    <!--物理删除-->
+    <delete id="delete">
+        DELETE FROM sys_user
+        WHERE id = #{id}
+    </delete>
+
+    <!--逻辑删除-->
+    <update id="deleteByLogic">
+        UPDATE sys_user SET
+        del_flag = #{DEL_FLAG_DELETE}
+        WHERE id = #{id}
+    </update>
+
+
+    <!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+    <select id="findUniqueByProperty" resultType="User"  statementType="STATEMENT">
+        select * FROM sys_user  where ${propertyName} = '${value}'
+    </select>
+
+</mapper>

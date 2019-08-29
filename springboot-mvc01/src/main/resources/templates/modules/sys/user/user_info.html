@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>保存</title>
+    <script th:src="@{/plugin/jquery/jquery-3.4.1.min.js}"></script>
+    <link rel="stylesheet" th:href="@{/plugin/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/plugin/bootstrap/css/bootstrap-theme.min.css}">
+    <link rel="stylesheet" th:href="@{/common/css/base.css}">
+    <link rel="stylesheet" th:href="@{/common/css/app-blue.css}">
+    <script th:src="@{/plugin/bootstrap/js/bootstrap.min.js}"></script>
+    <script>
+    </script>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row-fluid">
+            <table class="table table-bordered">
+                <tr>
+                    <th>用户Code</th>
+                    <td th:text="${user.code}"></td>
+                    <th>用户姓名</th>
+                    <td th:text="${user.name}"></td>
+                </tr>
+                <tr>
+                    <th>用户账号</th>
+                    <td th:text="${user.account}"></td>
+                    <th>用户电话</th>
+                    <td th:text="${user.tel}"></td>
+                </tr>
+                <tr>
+                    <th>备注</th>
+                    <td th:text="${user.remarks}"></td>
+                </tr>
+            </table>
+
+    <div>
+</div>
+</body>
+</html>

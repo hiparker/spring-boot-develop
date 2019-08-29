@@ -1,0 +1,114 @@
+.parent-container{
+    width: 100%;
+    height: 100%;
+}
+
+.parent-container .container-top{
+    width: 100%;
+}
+.parent-container .container-top .inner-content-menu-horizontal{
+    background: #3CA2E0;
+    width: 100%;
+}
+
+.parent-container .container-bottom{
+    position: absolute;
+    top:52px;
+    width: 100%;
+    height: calc(100% - 52px);
+}
+.parent-container .container-bottom>.container-left{
+    position: relative;
+    transition: left 0.2s linear;
+    width: 220px;
+    height: 100%;
+    float: left;
+}
+.parent-container .container-bottom>.container-left>.inner-content-menu-vertical{
+    width: 100%;
+    height: 100%;
+    background: #263238;
+}
+.parent-container .container-bottom>.container-right{
+    position: relative;
+    width: calc(100% - 220px);
+    height: 100%;
+    float: left;
+}
+.parent-container .container-bottom>.container-right>.inner-content-main{
+    width: 100%;
+    height: 100%;
+}
+
+
+/* 更改 Bootstrap 固有样式 */
+.navbar-inverse{
+    border-radius: 0px;
+    background: #3CA2E0;
+    border-color: #3CA2E0;
+    color:#fff;
+}
+.navbar-inverse .navbar-header>.navbar-header-title{
+    width: 220px;
+    text-align: center;
+}
+.navbar-inverse .navbar-brand {
+    padding: 15px 5px;
+    font-size: 18px;
+    line-height: 20px;
+    height: 20px;
+    display: block;
+    float: none;
+    color: #d6ebf8;
+}
+
+.navbar-inverse .navbar-nav>li>a{
+    color:#fff;
+}
+.navbar-inverse .navbar-nav>.active>a, .navbar-inverse .navbar-nav>.open>a {
+    background: #2089C9;
+}
+.navbar-inverse .navbar-nav>.open>a, .navbar-inverse .navbar-nav>.open>a:focus, .navbar-inverse .navbar-nav>.open>a:hover{
+    background: #2089C9;
+}
+.navbar-inverse .navbar-nav>.active>a, .navbar-inverse .navbar-nav>.active>a:focus, .navbar-inverse .navbar-nav>.active>a:hover{
+    background: #2089C9;
+}
+.navbar-inverse .navbar-nav>li>a:hover{
+    background: #2089C9;
+}
+
+
+/* 布局 风格*/
+.wrapper-content {
+    padding: 10px;
+}
+.panel {
+    margin-bottom: 10px;
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0;
+}
+.panel-primary > .panel-heading {
+    color: #fff;
+    /* 暂时强加颜色 */
+    background: #3ca2e0;
+    border-color: #3ca2e0;
+    border-radius: 0;
+    padding: 15px;
+}
+.panel-primary > .panel-heading > .panel-title {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 16px;
+    color: inherit;
+}
+.table>thead>tr>th{
+    border-bottom: 1px solid #ddd;
+}
+
+
+/* 竖菜单*/
+.sidebar-menu>li:hover>a,.sidebar-menu>li.active>a {
+    border-left-color: #3498DB
+}

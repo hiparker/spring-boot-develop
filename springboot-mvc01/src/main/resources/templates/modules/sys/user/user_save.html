@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>保存</title>
+    <script th:src="@{/plugin/jquery/jquery-3.4.1.min.js}"></script>
+    <link rel="stylesheet" th:href="@{/plugin/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/plugin/bootstrap/css/bootstrap-theme.min.css}">
+    <link rel="stylesheet" th:href="@{/common/css/base.css}">
+    <link rel="stylesheet" th:href="@{/common/css/app-blue.css}">
+    <script th:src="@{/plugin/bootstrap/js/bootstrap.min.js}"></script>
+    <script>
+        /**
+         * 根据form表单的获取表单下所有可提交的表单数据，封装成数组对象
+         */
+        function getFormData(obj){
+            var data = {};
+            var results = $(obj).serializeArray();
+            $.each(results,function(index,item){
+                //文本表单的值不为空才处理
+                if(item.value && $.trim(item.value)!=""){
+                    if(!data[item.name]){
+                        data[item.name]=item.value;
+                    }else{
+                        //name属性相同的表单，值以英文,拼接
+                        data[item.name]=data[item.name]+','+item.value;
+                    }
+                }
+            });
+            return data;
+        }
+
+        function getValue(){
+            return $('#inputForm').serialize();
+        }
+
+        function getValueJson(){
+            return getFormData($('#inputForm'));
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <form id="inputForm" th:object="${user}" class="form-horizontal form-group">
+            <input type="hidden" th:field="*{id}" >
+            <input type="hidden" th:field="*{sysversion}">
+            <table class="table table-bordered">
+                <tr>
+                    <th>用户Code</th>
+                    <td>
+                        <input type="text" th:field="*{code}" class="form-control" >
+                    </td>
+                    <th>用户姓名</th>
+                    <td>
+                        <input type="text" th:field="*{name}" class="form-control">
+                    </td>
+                </tr>
+                <tr>
+                    <th>用户账号</th>
+                    <td>
+                        <input type="text" th:field="*{account}" class="form-control">
+                    </td>
+                    <th>用户电话</th>
+                    <td>
+                        <input type="text"  th:field="*{tel}" class="form-control">
+                    </td>
+                </tr>
+                <tr>
+
+                    <th>用户密码</th>
+                    <td>
+                        <input type="text"  name="password" id="password" class="form-control">
+                    </td>
+                    <th>确认密码</th>
+                    <td>
+                        <input type="text" name="valiPassword" id="valiPassword" class="form-control">
+                    </td>
+                </tr>
+                <tr>
+                    <th>备注</th>
+                    <td>
+                        <input type="text"  th:field="*{remarks}" class="form-control">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    <div>
+</div>
+</body>
+</html>

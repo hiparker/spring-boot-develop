@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart.Develop 系统</title>
+    <script th:src="@{/plugin/jquery/jquery-2.0.0.min.js}"></script>
+    <link rel="stylesheet" th:href="@{/plugin/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/plugin/bootstrap/css/bootstrap-theme.min.css}">
+    <link rel="stylesheet" th:href="@{/common/css/base.css}">
+    <link rel="stylesheet" th:href="@{/common/css/app-blue.css}">
+    <script th:src="@{/plugin/bootstrap/js/bootstrap.min.js}"></script>
+    <script th:src="@{/plugin/layui/layer/layer.js}"></script>
+
+    <!-- 图标库 -->
+    <link rel="stylesheet" th:href="@{/plugin/font-awesome/css/font-awesome.min.css}">
+
+    <!-- 手风琴菜单 -->
+    <script th:src="@{/plugin/sidebar-menu/js/sidebar-menu.js}"></script>
+    <link rel="stylesheet" th:href="@{/plugin/sidebar-menu/css/sidebar-menu.css}">
+
+    <script>
+        var userId = '[[${user.id}]]';
+        if(null == userId || '' == userId){
+            location.href = location.href;
+        }
+    </script>
+    <script>
+        function changeFrameHeight(){
+            var ifm = document.getElementById("main");
+            ifm.height = document.documentElement.clientHeight-56;
+        }
+        window.onresize = function(){ changeFrameHeight();}
+        $(function(){
+            //响应式
+            changeFrameHeight();
+            //菜单
+            $.sidebarMenu($('.sidebar-menu'));
+        });
+        
+        function  userInfo() {
+            var width = "800px",height="500px";
+            var auto = true;//是否使用响应式，使用百分比时，应设置为false
+            if(width.indexOf("%")>=0 || height.indexOf("%")>=0 ){
+                auto =false;
+            }
+            top.layer.open({
+                type: 2,
+                area: [width, height],
+                title: "个人信息",
+                auto:auto,
+                maxmin: true, //开启最大化最小化按钮
+                content: "/a/user/info" ,
+                btn:  ['关闭'],
+                btn1: function(index){
+                    top.layer.close(index);
+                }
+            });
+            
+        }
+
+        function  updatePassword() {
+            var width = "800px",height="500px";
+            var auto = true;//是否使用响应式，使用百分比时，应设置为false
+            if(width.indexOf("%")>=0 || height.indexOf("%")>=0 ){
+                auto =false;
+            }
+            top.layer.open({
+                type: 2,
+                area: [width, height],
+                title: "修改密码",
+                auto:auto,
+                maxmin: true, //开启最大化最小化按钮
+                content: "/a/user/updatePasswordForm" ,
+                btn: ['确定', '关闭'],
+                yes: function(index, layero){
+                    var iframeWin = layero.find('iframe')[0]; //得到弹出的窗口对象，执行窗口内iframe页的方法：iframeWin.method();
+
+                    var val = iframeWin.contentWindow.getValueJson();
+                    if(val.password != val.valiPassword){
+                        top.layer.alert("密码不一致");
+                        return false;
+                    }
+
+                    var indexN = top.layer.msg("正在提交...", {
+                        icon: 16
+                        ,shade: 0.01,
+                        time:999999999//设置超长时间
+                    });
+
+                    $.ajax({
+                        url:"/a/user/updatePassword",
+                        type:"post",
+                        data:iframeWin.contentWindow.getValue(),
+                        success:function(data){
+                            top.layer.close(indexN);
+                            if(data.success){
+                                top.layer.alert(data.msg);
+                                top.layer.close(index);
+                            }else{
+                                top.layer.alert(data.msg);
+                            }
+
+                        }
+                    });
+                },
+                cancel: function(index){
+                }
+            });
+
+        }
+        
+    </script>
+    <script>
+
+    </script>
+</head>
+<body>
+    <div class="parent-container">
+            <div class="container-top">
+                <!-- 菜单 -->
+                <div class="inner-content-menu-horizontal">
+                    <nav class="navbar  navbar-inverse" role="navigation">
+                        <div class="navbar-header">
+                            <div class="navbar-header-title">
+                                <a class="navbar-brand J_menuItem" href="#" data-index="0">Smart.Develop系统</a>
+                            </div>
+                        </div>
+                        <div class="container-fluid">
+                            <div>
+                                <!--向左对齐-->
+                                <ul class="nav navbar-nav navbar-left">
+                                    <li class="active">
+                                        <a th:href="@{/account/hello}" target="main">主页</a>
+                                    </li>
+                                    <li>
+                                        <a th:href="@{/user/list}" target="main">用户管理</a>
+                                    </li>
+                                    <li>
+                                        <a th:href="@{/menu/list}" target="main">菜单管理</a>
+                                    </li>
+                                </ul>
+
+
+                                <!--向右对齐-->
+                                <ul class="nav navbar-nav navbar-right">
+                                    <li class="dropdown" th:if="${user != null}">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                            欢迎 [[${user.name}]]<b class="caret"></b>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="javascript:void(0)" style="cursor: pointer" onclick="userInfo()">个人信息</a></li>
+                                            <li><a href="javascript:void(0)" style="cursor: pointer"  onclick="updatePassword()">修改密码</a></li>
+                                            <li class="divider"></li>
+                                            <li><a th:href="@{/account/unlogin}">退出登录</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+            <div class="container-bottom">
+                <div class="container-left">
+                    <!-- 竖菜单 -->
+                    <div class="inner-content-menu-vertical">
+
+                        <aside class="main-sidebar">
+                            <section class="sidebar">
+                                <ul class="sidebar-menu">
+                                    <li>
+                                        <a href="#">
+                                            <i class="fa fa-th"></i> <span>窗口小部件</span>
+                                        </a>
+                                    </li>
+                                    <li class="treeview">
+                                        <a href="#">
+                                            <i class="fa fa-pie-chart"></i>
+                                            <span>图表</span>
+                                            <i class="fa fa-angle-right pull-right"></i>
+                                        </a>
+                                        <ul class="treeview-menu">
+                                            <li><a href="#"><i class="fa fa-circle-o"></i> ChartJS</a></li>
+                                            <li><a href="#"><i class="fa fa-circle-o"></i> Morris</a></li>
+                                            <li><a href="#"><i class="fa fa-circle-o"></i> Flot</a></li>
+                                            <li><a href="#"><i class="fa fa-circle-o"></i> Inline charts</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="treeview">
+                                        <a href="#">
+                                            <i class="fa fa-laptop"></i>
+                                            <span>UI 元素</span>
+                                            <i class="fa fa-angle-right pull-right"></i>
+                                        </a>
+                                        <ul class="treeview-menu">
+                                            <li><a href="#"><i class="fa fa-circle-o"></i> 一般</a></li>
+                                            <li><a href="#"><i class="fa fa-circle-o"></i> Icons图标</a></li>
+                                            <li><a href="#"><i class="fa fa-circle-o"></i> 按钮</a></li>
+                                            <li><a href="#"><i class="fa fa-circle-o"></i> 滑块</a></li>
+                                            <li><a href="#"><i class="fa fa-circle-o"></i> 时间表</a></li>
+                                            <li><a href="#"><i class="fa fa-circle-o"></i> 模态框</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="treeview">
+                                        <a href="#">
+                                            <i class="fa fa-edit"></i> <span>表单</span>
+                                            <i class="fa fa-angle-right pull-right"></i>
+                                        </a>
+                                        <ul class="treeview-menu">
+                                            <li><a href="#"><i class="fa fa-circle-o"></i> 一般表单</a></li>
+                                            <li><a href="#"><i class="fa fa-circle-o"></i> 高级表单</a></li>
+                                            <li><a href="#"><i class="fa fa-circle-o"></i> 可编辑表单</a></li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <i class="fa fa-envelope"></i> <span>邮箱</span>
+                                            <small class="label pull-right label-warning">12</small>
+                                        </a>
+                                    </li>
+                                    <li class="treeview">
+                                        <a href="#">
+                                            <i class="fa fa-share"></i> <span>多级</span>
+                                            <i class="fa fa-angle-right pull-right"></i>
+                                        </a>
+                                        <ul class="treeview-menu">
+                                            <li><a href="#"><i class="fa fa-circle-o"></i> 一级</a></li>
+                                            <li>
+                                                <a href="#"><i class="fa fa-circle-o"></i> 一级 <i class="fa fa-angle-right pull-right"></i></a>
+                                                <ul class="treeview-menu">
+                                                    <li><a href="#"><i class="fa fa-circle-o"></i> 二级</a></li>
+                                                    <li>
+                                                        <a href="#"><i class="fa fa-circle-o"></i> 二级 <i class="fa fa-angle-right pull-right"></i></a>
+                                                        <ul class="treeview-menu">
+                                                            <li><a href="#"><i class="fa fa-circle-o"></i> 三级</a></li>
+                                                            <li><a href="#"><i class="fa fa-circle-o"></i> 三级</a></li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li><a href="#"><i class="fa fa-circle-o"></i> 一级</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="header">标签</li>
+                                    <li><a href="#"><i class="fa fa-circle-o text-red"></i> <span>重要</span></a></li>
+                                    <li><a href="#"><i class="fa fa-circle-o text-yellow"></i> <span>警告</span></a></li>
+                                    <li><a href="#"><i class="fa fa-circle-o text-aqua"></i> <span>通知</span></a></li>
+                                </ul>
+                            </section>
+                        </aside>
+
+                    </div>
+                    <!-- 竖菜单结束 -->
+                </div>
+                <div class="container-right">
+                    <!-- 内容展示区域 -->
+                    <div class="inner-content-main">
+                        <iframe th:src="@{/account/hello}" id="main" name="main" frameborder="0" scrolling="auto" width="100%"></iframe>
+                    </div>
+                </div>
+            </div>
+
+    </div>
+
+<!--<div class="container-fluid" style="width: 100%">
+    <div class="row-fluid">
+
+    </div>
+
+</div>-->
+</body>
+</html>

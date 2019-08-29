@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>用户列表</title>
+    <script th:src="@{/plugin/jquery/jquery-3.4.1.min.js}"></script>
+    <link rel="stylesheet" th:href="@{/plugin/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/plugin/bootstrap/css/bootstrap-theme.min.css}">
+    <link rel="stylesheet" th:href="@{/common/css/base.css}">
+    <link rel="stylesheet" th:href="@{/common/css/app-blue.css}">
+    <script th:src="@{/plugin/bootstrap/js/bootstrap.min.js}"></script>
+    <!--这里引入bootstrap-table 依赖的插件，bootstrap-table.js已经合并在vendor.js中-->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" th:href="@{/plugin/bootstrap-table/bootstrap-table.min.css}">
+    <script th:src="@{/plugin/bootstrap-table/bootstrap-table.min.js}"></script>
+    <script th:src="@{/plugin/bootstrap-table/locale/bootstrap-table-zh-CN.js}"></script>
+    <script th:src="@{/plugin/layui/layer/layer.js}"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#table').bootstrapTable({
+                //请求方法
+                method: 'post',
+                //类型json
+                dataType: "json",
+                contentType: "application/x-www-form-urlencoded",
+                //显示检索按钮
+                showSearch: false,
+                //显示刷新按钮
+                showRefresh: false,
+                //显示切换手机试图按钮
+                showToggle: false,
+                //显示 内容列下拉框
+                showColumns: false,
+                //显示到处按钮
+                showExport: false,
+                //显示切换分页按钮
+                showPaginationSwitch: false,
+                //最低显示2行
+                minimumCountColumns: 2,
+                //是否显示行间隔色
+                striped: true,
+                //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                cache: false,
+                //是否显示分页（*）
+                pagination: true,
+                //排序方式
+                sortOrder: "asc",
+                //初始化加载第一页，默认第一页
+                pageNumber:1,
+                //每页的记录行数（*）
+                pageSize: 5,
+                //可供选择的每页的行数（*）
+                pageList: [5, 15, 50, 100],
+                //这个接口需要处理bootstrap table传递的固定参数,并返回特定格式的json数据
+                url: "/a/user/data",
+                //默认值为 'limit',传给服务端的参数为：limit, offset, search, sort, order Else
+                //queryParamsType:'',
+                ////查询参数,每次调用是会带上这个参数，可自定义
+                queryParams : function(params) {
+                    var searchParam = getFormData($("#searchForm"));
+                    searchParam.pageNo = params.limit === undefined? "1" :params.offset/params.limit+1;
+                    searchParam.pageSize = params.limit === undefined? -1 : params.limit;
+                    searchParam.orderBy = params.sort === undefined? "update_date DESC" : params.sort+ " "+  params.order;
+                    return searchParam;
+                },
+                //分页方式：client客户端分页，server服务端分页（*）
+                sidePagination: "server",
+                contextMenuTrigger:"right",//pc端 按右键弹出菜单
+                contextMenuTriggerMobile:"press",//手机端 弹出菜单，click：单击， press：长按。
+                contextMenu: '#context-menu',
+                onContextMenuItem: function(row, $el){
+
+                },
+
+                onClickRow: function(row, $el){
+                },
+                onShowSearch: function () {
+                    $("#search-collapse").slideToggle();
+                },
+                columns: [
+                    {
+                        checkbox: true
+                    }
+                    ,{
+                        field: 'code',
+                        title: '编号',
+                        sortable: false,
+                        sortName: 'code'
+                    }
+                    ,{
+                        field: 'name',
+                        title: '名称',
+                        sortable: false,
+                        sortName: 'name'
+                    }
+                    ,{
+                        field: 'account',
+                        title: '账号',
+                        sortable: true,
+                        sortName: 'account'
+                    }
+                    ,{
+                        field: 'tel',
+                        title: '手机号',
+                        sortable: true,
+                        sortName: 'tel'
+
+                    }
+                    ,{
+                        field: 'createBy.name',
+                        title: '创建人',
+                        sortable: false,
+                        sortName: 'createBy.name',
+                        cellStyle:{
+                            css:{
+                                "width":"140px",
+                                "min-width":"140px",
+                                "max-width":"140px"
+                            }
+                        }
+
+                    }
+                    ,{
+                        field: 'createDate',
+                        title: '创建日期',
+                        sortable: false,
+                        sortName: 'createDate',
+                        cellStyle:{
+                            css:{
+                                "width":"170px",
+                                "min-width":"170px",
+                                "max-width":"170px"
+                            }
+                        }
+
+                    }
+                    ,{
+                        field: 'updateBy.name',
+                        title: '修改人',
+                        sortable: false,
+                        sortName: 'updateBy.name',
+                        cellStyle:{
+                            css:{
+                                "width":"140px",
+                                "min-width":"140px",
+                                "max-width":"140px"
+                            }
+                        }
+
+                    },{
+                        field: 'updateDate',
+                        title: '修改日期',
+                        sortable: false,
+                        sortName: 'updateDate',
+                        cellStyle:{
+                            css:{
+                                "width":"170px",
+                                "min-width":"170px",
+                                "max-width":"170px"
+                            }
+                        }
+
+                    }
+                    ,{
+                        field: 'remarks',
+                        title: '备注',
+                        sortable: false,
+                        sortName: 'remarks'
+
+                    }
+                ]
+
+            });
+
+
+            if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){//如果是移动端
+                $('#table').bootstrapTable("toggleView");
+            }
+
+            $('#table').on('check.bs.table uncheck.bs.table load-success.bs.table ' +
+                'check-all.bs.table uncheck-all.bs.table', function () {
+                $('#remove').prop('disabled', ! $('#table').bootstrapTable('getSelections').length);
+                $('#edit').prop('disabled', $('#table').bootstrapTable('getSelections').length!=1);
+            });
+
+            $("#search").click("click", function() {// 绑定查询按扭
+                refresh();
+            });
+
+            $("#reset").click("click", function() {// 绑定查询按扭
+                $("#searchForm  input").val("");
+                $("#searchForm  select").val("");
+                refresh();
+            });
+
+        });
+
+        function getSelections() {
+            return $.map($("#table").bootstrapTable('getSelections'), function (row) {
+                return row
+            });
+        }
+
+        //删除
+        function delAll(id){
+            var params = [];
+            if(id == undefined){
+                var rows = getSelections();
+                for(var i = 0;i<rows.length;i++){
+                    var map ={
+                        id:rows[i].id
+                    };
+                    params.push(map);
+                }
+            }else{
+                var map ={
+                    id:id
+                };
+                params.push(map);
+            }
+            top.layer.confirm("是否删除该用户",
+                {icon: 3, title:'系统提示', btn: ['是','否'] //按钮
+                }, function(index){
+                    var indexN = top.layer.msg("正在删除...", {
+                        icon: 16
+                        ,shade: 0.01,
+                        time:999999999//设置超长时间
+                    });
+
+                    $.ajax({
+                        headers:{
+                            "Content-Type":"application/json"
+                        },
+                        url:"/a/user/delAll",
+                        type:"post",
+                        data:JSON.stringify(params),
+                        success:function(data){
+                            top.layer.close(indexN);
+                            if(data.success){
+                                layer.alert(data.msg);
+                                refresh();
+                            }else{
+                                layer.alert(data.msg);
+                            }
+                            top.layer.close(index);
+                        }
+                    });
+                });
+        }
+
+        //修改
+        function edit(id){
+            if(id == undefined){
+                id = getSelections()[0].id;
+            }
+            var width = "800px",height="500px";
+            var auto = true;//是否使用响应式，使用百分比时，应设置为false
+            if(width.indexOf("%")>=0 || height.indexOf("%")>=0 ){
+                auto =false;
+            }
+            top.layer.open({
+                type: 2,
+                area: [width, height],
+                title: "编辑",
+                auto:auto,
+                maxmin: true, //开启最大化最小化按钮
+                content: "/a/user/form?id="+id ,
+                btn: ['确定', '关闭'],
+                yes: function(index, layero){
+                    var iframeWin = layero.find('iframe')[0]; //得到弹出的窗口对象，执行窗口内iframe页的方法：iframeWin.method();
+
+                    var val = iframeWin.contentWindow.getValueJson();
+                    if(val.password != val.valiPassword){
+                        top.layer.alert("密码不一致");
+                        return false;
+                    }
+
+                    var indexN = top.layer.msg("正在提交...", {
+                        icon: 16
+                        ,shade: 0.01,
+                        time:999999999//设置超长时间
+                    });
+
+                    $.ajax({
+                        url:"/a/user/save",
+                        type:"post",
+                        data:iframeWin.contentWindow.getValue(),
+                        success:function(data){
+                            top.layer.close(indexN);
+                            if(data.success){
+                                top.layer.alert(data.msg);
+                                refresh();
+                            }else{
+                                top.layer.alert(data.msg);
+                            }
+                            top.layer.close(index);
+                        }
+                    });
+                },
+                cancel: function(index){
+                }
+            });
+        }
+
+
+        //添加
+        function add(){
+
+            var width = "800px",height="500px";
+            var auto = true;//是否使用响应式，使用百分比时，应设置为false
+            if(width.indexOf("%")>=0 || height.indexOf("%")>=0 ){
+                auto =false;
+            }
+            top.layer.open({
+                type: 2,
+                area: [width, height],
+                title: "编辑",
+                auto:auto,
+                maxmin: true, //开启最大化最小化按钮
+                content: "/a/user/form" ,
+                btn: ['确定', '关闭'],
+                yes: function(index, layero){
+                    var iframeWin = layero.find('iframe')[0]; //得到弹出的窗口对象，执行窗口内iframe页的方法：iframeWin.method();
+
+
+
+                    var val = iframeWin.contentWindow.getValueJson();
+                    if(val.password != val.valiPassword){
+                        top.layer.alert("密码不一致");
+                        return false;
+                    }
+
+                    var indexN = top.layer.msg("正在提交...", {
+                        icon: 16
+                        ,shade: 0.01,
+                        time:999999999//设置超长时间
+                    });
+
+                    $.ajax({
+                        url:"/a/user/save",
+                        type:"post",
+                        data:iframeWin.contentWindow.getValue(),
+                        success:function(data){
+                            top.layer.close(indexN);
+                            if(data.success){
+                                top.layer.alert(data.msg);
+                                refresh();
+                            }else{
+                                top.layer.alert(data.msg);
+                            }
+                            top.layer.close(index);
+                        }
+                    });
+                },
+                cancel: function(index){
+                }
+            });
+        }
+
+        //刷新列表
+        function refresh(){
+            $('#table').bootstrapTable('refresh');
+        }
+
+        /**
+         * 根据form表单的获取表单下所有可提交的表单数据，封装成数组对象
+         */
+        function getFormData(obj){
+            var data = {};
+            var results = $(obj).serializeArray();
+            $.each(results,function(index,item){
+                //文本表单的值不为空才处理
+                if(item.value && $.trim(item.value)!=""){
+                    if(!data[item.name]){
+                        data[item.name]=item.value;
+                    }else{
+                        //name属性相同的表单，值以英文,拼接
+                        data[item.name]=data[item.name]+','+item.value;
+                    }
+                }
+            });
+            return data;
+        }
+
+    </script>
+
+</head>
+<body>
+    <div class="wrapper wrapper-content">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">用户列表</h3>
+            </div>
+            <div class="panel-body">
+                <!-- 工具栏 -->
+                <div id="toolbar">
+
+                    <button id="add" class="btn btn-primary" onclick="add()">
+                        新建
+                    </button>
+
+                    <button id="edit" class="btn btn-success" disabled onclick="edit()">
+                        修改
+                    </button>
+
+                    <button id="remove" class="btn btn-danger" disabled onclick="delAll()">
+                        删除
+                    </button>
+
+                    <button id="refresh" class="btn btn-success"  onclick="refresh()">
+                        刷新
+                    </button>
+                    <a class="accordion-toggle btn btn-default" data-toggle="collapse"
+                       href="#search-collapse">
+                        查询条件
+                    </a>
+
+                </div>
+
+                <!-- 搜索 -->
+                <div id="search-collapse" class="collapse">
+                    <div class="accordion-inner">
+                        <form id="searchForm" class="form form-horizontal well clearfix">
+                            <div class="col-xs-12 col-sm-6 col-md-4">
+                                <label class="label-item single-overflow pull-left" title="Code：">Code：</label>
+                                <input type="text" name="code" id="code" maxlength="64" class=" form-control"/>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-4">
+                                <label class="label-item single-overflow pull-left" title="Code：">姓名：</label>
+                                <input type="text" name="name" id="name" maxlength="64" class=" form-control"/>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-4">
+                                <label class="label-item single-overflow pull-left" title="Code：">账号：</label>
+                                <input type="text" name="account" id="account" maxlength="64" class=" form-control"/>
+                            </div>
+
+                            <div class="col-xs-12 col-sm-6 col-md-4">
+                                <div style="margin-top:26px">
+                                    <a  id="search" class="btn btn-primary btn-rounded  btn-bordered btn-sm">查询</a>&nbsp;
+                                    <a  id="reset" class="btn btn-primary btn-rounded  btn-bordered btn-sm" >重置</a>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 表格 -->
+                <table id="table"   data-toolbar="#toolbar"></table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
