@@ -112,3 +112,11 @@
 .sidebar-menu>li:hover>a,.sidebar-menu>li.active>a {
     border-left-color: #3498DB
 }
+
+.width-15{
+    width: 15%;
+}
+
+.width-35{
+    width: 35%;
+}

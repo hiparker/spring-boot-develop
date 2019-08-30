@@ -12,9 +12,7 @@ import com.edwin.practive.springbootmvc01.modules.sys.mapper.MenuMapper;
 import com.edwin.practive.springbootmvc01.modules.sys.mapper.UserMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
 //import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +23,7 @@ public class MenuService extends CrudService<MenuMapper,Menu>{
 
 
     private List<Menu> menuList;
+    private Map<String,Menu> menuMap;
 
 
     /**
@@ -35,8 +34,15 @@ public class MenuService extends CrudService<MenuMapper,Menu>{
     //@Transactional(readOnly = false)
     @Override
     public int save(Menu menu){
+
+        if(StringUtils.isEmpty(menu.getId())){
+            Menu parent = this.getMenuMap(menu.getParent().getId());
+            menu.setParentIds(parent.getParentIds()+parent.getId()+",");
+        }
+
         int count = super.save(menu);
         menuList.clear();
+        menuMap.clear();
         this.findListAll();
         return count;
     }
@@ -49,16 +55,23 @@ public class MenuService extends CrudService<MenuMapper,Menu>{
      */
     //@Transactional(readOnly = false)
     public int remove(Menu menu){
+        if(menu.getParentId().equals(0)){
+            return 0;
+        }
         int count = super.delete(menu);
         menuList.clear();
+        menuMap.clear();
         this.findListAll();
         return count;
     }
     public int remove(String id){
-        Menu menu = new Menu();
-        menu.setId(id);
+        Menu menu = this.get(id);
+        if(menu.getParentId().equals(0)){
+            return 0;
+        }
         int count = super.delete(menu);
         menuList.clear();
+        menuMap.clear();
         this.findListAll();
         return count;
     }
@@ -71,6 +84,10 @@ public class MenuService extends CrudService<MenuMapper,Menu>{
     public List<Menu> findListAll(){
         if(null == menuList || menuList.isEmpty()){
             menuList = Collections.synchronizedList(super.findAllList(new Menu()));
+            menuMap = Collections.synchronizedMap(new HashMap<>());
+            for (Menu menu : menuList) {
+                menuMap.put(menu.getId(),menu);
+            }
         }
         return menuList;
     }
@@ -88,5 +105,12 @@ public class MenuService extends CrudService<MenuMapper,Menu>{
     }
 
 
+    // 获取菜单信息
+    public Map<String, Menu> getMenuMaps() {
+        return menuMap;
+    }
+    public Menu getMenuMap(String key) {
+        return menuMap.get(key);
+    }
 
 }

@@ -77,7 +77,7 @@
         });
         // 如果没有固定列就放回去吧。。。
         if(self.leftFixedColumns.length==1){
-            self.noFixedColumns.unshift(self.leftFixedColumns[0])
+            self.noFixedColumns.unshift(self.leftFixedColumns[0]);
             self.leftFixedColumns.pop();
         }else{
             self.hasFixedColumn = true;
@@ -119,7 +119,6 @@
         var self = this;
         var $toolbar = $("<div class='treetable-bars'></div>");
         if (self.options.toolbar) {
-            $(self.options.toolbar).addClass('tool-left');
             $toolbar.append($(self.options.toolbar));
         }
         var $rightToolbar = $('<div class="btn-group tool-right">');
@@ -159,7 +158,7 @@
             var _index = $.inArray(field, self.leftFixedColumns);
             if (!(_index > -1)) {
                 self.$el.parent().parent().find("." + field + "_cls").hide();
-                var $input = $(".bootstrap-tree-table .treetable-bars .columns label").find("input[value='" + field + "']")
+                var $input = $(".bootstrap-tree-table .treetable-bars .columns label").find("input[value='" + field + "']");
                 $input.prop("checked", '');
             }
         });
@@ -213,7 +212,7 @@
         self.data_obj = {};
         var $tbody = self.$el.find("tbody");
         // 添加加载loading
-        var $loading = '<tr><td colspan="' + self.options.columns.length + '"><div style="display: block;text-align: center;">正在努力地加载数据中，请稍候……</div></td></tr>'
+        var $loading = '<tr><td colspan="' + self.options.columns.length + '"><div style="display: block;text-align: center;">正在努力地加载数据中，请稍候……</div></td></tr>';
         $tbody.html($loading);
         if (self.options.url) {
             $.ajax({
@@ -229,7 +228,7 @@
                     });
                 },
                 error: function(res, textStatus) {
-                    var _errorMsg = '<tr><td colspan="' + self.options.columns.length + '"><div style="display: block;text-align: center;">' + res.responseText + '</div></td></tr>'
+                    var _errorMsg = '<tr><td colspan="' + self.options.columns.length + '"><div style="display: block;text-align: center;">' + res.responseText + '</div></td></tr>';
                     $tbody.html(_errorMsg);
                     self.trigger('load-error', textStatus, res);
                 }
@@ -253,7 +252,7 @@
         // 先清空
         $tbody.html("");
         if (!data || data.length <= 0) {
-            var _empty = '<tr><td colspan="' + self.options.columns.length + '"><div style="display: block;text-align: center;">没有找到匹配的记录</div></td></tr>'
+            var _empty = '<tr><td colspan="' + self.options.columns.length + '"><div style="display: block;text-align: center;">没有找到匹配的记录</div></td></tr>';
             $tbody.html(_empty);
             return;
         }
@@ -264,7 +263,7 @@
         // 开始绘制
         if (rootNode) {
             $.each(rootNode, function(i, item) {
-                var _child_row_id = "row_id_" + i
+                var _child_row_id = "row_id_" + i;
                 self.recursionNode(item, 1, _child_row_id, "row_root");
             });
         }
@@ -435,7 +434,7 @@
     // 缓存并格式化数据
     BootstrapTreeTable.prototype.formatData = function(data) {
         var self = this;
-        var _root = self.options.rootIdValue ? self.options.rootIdValue : null
+        var _root = self.options.rootIdValue ? self.options.rootIdValue : null;
         $.each(data, function(index, item) {
             // 添加一个默认属性，用来判断当前节点有没有被显示
             item.isShow = false;
@@ -756,7 +755,7 @@
             }
             if (_p_data) {
                 p_id = _p_data.row_id;
-                var _row_id_lastNum = 0
+                var _row_id_lastNum = 0;
                 if (row_id == "") {
                     if (_c_list && _c_list.length > 0) {
                         _row_id_lastNum = _c_list.length;
@@ -973,7 +972,7 @@
         self.$el.parent().parent().find("." + field + "_cls").show();
         //是否更新列选项状态
         if (self.options.showColumns) {
-            var $input = $(".bootstrap-tree-table .treetable-bars .columns label").find("input[value='" + field + "']")
+            var $input = $(".bootstrap-tree-table .treetable-bars .columns label").find("input[value='" + field + "']");
             $input.prop("checked", 'checked');
         }
         self.autoReSize();
@@ -991,7 +990,7 @@
         self.$el.parent().parent().find("." + field + "_cls").hide();
         //是否更新列选项状态
         if (self.options.showColumns) {
-            var $input = $(".bootstrap-tree-table .treetable-bars .columns label").find("input[value='" + field + "']")
+            var $input = $(".bootstrap-tree-table .treetable-bars .columns label").find("input[value='" + field + "']");
             $input.prop("checked", '');
         }
         self.autoReSize();

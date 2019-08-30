@@ -29,7 +29,7 @@ public class Menu extends DataEntity<Menu> {
 	private String target; 	// 目标（ mainFrame、_blank、_self、_parent、_top）
 	private String icon; 	// 图标
 	private Integer sort; 	// 排序
-	private String isShow; 	// 是否在菜单中显示（1：显示；0：不显示）
+	private String isVisible; 	// 是否在菜单中显示（1：显示；0：不显示）
 	private String type;    // 按钮类型
 	private String permission; // 权限标识
 
@@ -37,7 +37,7 @@ public class Menu extends DataEntity<Menu> {
 	public Menu(){
 		super();
 		this.sort = 30;
-		this.isShow = "1";
+		this.isVisible = "1";
 		this.type="1";
 	}
 	
@@ -110,12 +110,12 @@ public class Menu extends DataEntity<Menu> {
 	}
 	
 	@Length(min=1, max=1)
-	public String getIsShow() {
-		return isShow;
+	public String getIsVisible() {
+		return isVisible;
 	}
 
-	public void setIsShow(String isShow) {
-		this.isShow = isShow;
+	public void setIsVisible(String isVisible) {
+		this.isVisible = isVisible;
 	}
 
 	@Length(min=0, max=200)

@@ -6,6 +6,7 @@
     <script th:src="@{/plugin/jquery/jquery-3.4.1.min.js}"></script>
     <link rel="stylesheet" th:href="@{/plugin/bootstrap/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/plugin/bootstrap/css/bootstrap-theme.min.css}">
+    <link rel="stylesheet" th:href="@{/plugin/bootstrap-button/bootstrap-buttons.css}">
     <link rel="stylesheet" th:href="@{/common/css/base.css}">
     <link rel="stylesheet" th:href="@{/common/css/app-blue.css}">
     <script th:src="@{/plugin/bootstrap/js/bootstrap.min.js}"></script>
@@ -107,10 +108,10 @@
 
                     }
                     ,{
-                        field: 'createBy.name',
+                        field: 'createBy',
                         title: '创建人',
                         sortable: false,
-                        sortName: 'createBy.name',
+                        sortName: 'createBy',
                         cellStyle:{
                             css:{
                                 "width":"140px",
@@ -135,7 +136,7 @@
 
                     }
                     ,{
-                        field: 'updateBy.name',
+                        field: 'updateBy',
                         title: '修改人',
                         sortable: false,
                         sortName: 'updateBy.name',
@@ -237,10 +238,10 @@
                         success:function(data){
                             top.layer.close(indexN);
                             if(data.success){
-                                layer.alert(data.msg);
+                                top.layer.alert(data.msg);
                                 refresh();
                             }else{
-                                layer.alert(data.msg);
+                                top.layer.alert(data.msg);
                             }
                             top.layer.close(index);
                         }
@@ -395,22 +396,22 @@
                 <!-- 工具栏 -->
                 <div id="toolbar">
 
-                    <button id="add" class="btn btn-primary" onclick="add()">
+                    <button id="add" class="btn btn-primary btn-xs" onclick="add()">
                         新建
                     </button>
 
-                    <button id="edit" class="btn btn-success" disabled onclick="edit()">
+                    <button id="edit" class="btn btn-success btn-xs" disabled onclick="edit()">
                         修改
                     </button>
 
-                    <button id="remove" class="btn btn-danger" disabled onclick="delAll()">
+                    <button id="remove" class="btn btn-danger btn-xs" disabled onclick="delAll()">
                         删除
                     </button>
 
-                    <button id="refresh" class="btn btn-success"  onclick="refresh()">
+                    <button id="refresh" class="btn btn-success btn-xs"  onclick="refresh()">
                         刷新
                     </button>
-                    <a class="accordion-toggle btn btn-default" data-toggle="collapse"
+                    <a class="accordion-toggle btn btn-default btn-xs" data-toggle="collapse"
                        href="#search-collapse">
                         查询条件
                     </a>
@@ -436,8 +437,8 @@
 
                             <div class="col-xs-12 col-sm-6 col-md-4">
                                 <div style="margin-top:26px">
-                                    <a  id="search" class="btn btn-primary btn-rounded  btn-bordered btn-sm">查询</a>&nbsp;
-                                    <a  id="reset" class="btn btn-primary btn-rounded  btn-bordered btn-sm" >重置</a>
+                                    <a  id="search" class="btn btn-primary btn-rounded  btn-bordered btn-xs">查询</a>&nbsp;
+                                    <a  id="reset" class="btn btn-primary btn-rounded  btn-bordered btn-xs" >重置</a>
                                 </div>
                             </div>
 

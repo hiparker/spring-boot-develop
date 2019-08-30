@@ -9,6 +9,16 @@
     <link rel="stylesheet" th:href="@{/common/css/base.css}">
     <link rel="stylesheet" th:href="@{/common/css/app-blue.css}">
     <script th:src="@{/plugin/bootstrap/js/bootstrap.min.js}"></script>
+
+    <script th:src="@{/plugin/jquery-validation/1.14.0/jquery.validate.min.js}" type="text/javascript"></script>
+    <script th:src="@{/plugin/jquery-validation/1.14.0/localization/messages_zh.min.js}" type="text/javascript"></script>
+    <script th:src="@{/plugin/jquery-validation/1.14.0/validation-methods.js}" type="text/javascript"></script>
+    <style>
+        .error{
+            color: #ff0000;
+        }
+    </style>
+
     <script>
         /**
          * 根据form表单的获取表单下所有可提交的表单数据，封装成数组对象
@@ -47,40 +57,40 @@
             <input type="hidden" th:field="*{sysversion}">
             <table class="table table-bordered">
                 <tr>
-                    <th>用户Code</th>
-                    <td>
-                        <input type="text" th:field="*{code}" class="form-control" >
+                    <th class="width-15 active"><label class="pull-right"><font color="red">*</font> 用户Code:</label></th>
+                    <td class="width-35">
+                        <input type="text" th:field="*{code}" class="form-control required" >
                     </td>
-                    <th>用户姓名</th>
-                    <td>
-                        <input type="text" th:field="*{name}" class="form-control">
+                    <th class="width-15 active"><label class="pull-right"><font color="red">*</font>用户姓名</label></th>
+                    <td class="width-35">
+                        <input type="text" th:field="*{name}" class="form-control required">
                     </td>
                 </tr>
                 <tr>
-                    <th>用户账号</th>
-                    <td>
-                        <input type="text" th:field="*{account}" class="form-control">
+                    <th class="width-15 active"><label class="pull-right"><font color="red">*</font>用户账号</label></th>
+                    <td class="width-35">
+                        <input type="text" th:field="*{account}" class="form-control required">
                     </td>
-                    <th>用户电话</th>
-                    <td>
+                    <th class="width-15 active"><label class="pull-right"><font color="red">*</font>用户电话</label></th>
+                    <td  class="width-35">
                         <input type="text"  th:field="*{tel}" class="form-control">
                     </td>
                 </tr>
                 <tr>
 
-                    <th>用户密码</th>
-                    <td>
+                    <th class="width-15 active"><label class="pull-right">用户密码</label></th>
+                    <td  class="width-35">
                         <input type="text"  name="password" id="password" class="form-control">
                     </td>
-                    <th>确认密码</th>
-                    <td>
+                    <th class="width-15 active"><label class="pull-right">确认密码</label></th>
+                    <td  class="width-35">
                         <input type="text" name="valiPassword" id="valiPassword" class="form-control">
                     </td>
                 </tr>
                 <tr>
-                    <th>备注</th>
-                    <td>
-                        <input type="text"  th:field="*{remarks}" class="form-control">
+                    <th class="width-15 active"><label class="pull-right">备注</label></th>
+                    <td  class="width-35">
+                        <input type="text"  th:field="*{remarks}" maxlength="100" class="form-control">
                     </td>
                 </tr>
             </table>
