@@ -18,8 +18,11 @@
 
 </head>
 <body>
+    <div class="authBtn" style="display: none">
+        <button data-id="add" type="button" class="btn btn-primary btn-sm" onclick="add()" title="新建"><i class="glyphicon glyphicon-plus"></i> 新建</button>
+    </div>
+
     <div id="menu-toolbar"  class="btn-group-toggle" data-toggle="buttons">
-      <button type="button" class="btn btn-primary btn-sm" onclick="add()" title="新建"><i class="glyphicon glyphicon-plus"></i> 新建</button>
       <button type="button" class="btn btn-default btn-sm" onclick="refresh()" title="刷新"><i class="glyphicon glyphicon-repeat"></i> 刷新</button>
     </div>
 
@@ -36,6 +39,21 @@
 
 
 <script type="text/javascript">
+    // 获得权限
+    var auth = top.getAuth(top.authData,location.href);
+
+    // 释放权限
+    var toolBtn = $($("#menu-toolbar").children()[0]);
+    top.listSort(auth);
+    for(var i = 0;i<auth.length;i++){
+        if("增加" == auth[i].name){
+            var btn = $($(".authBtn").find("[data-id='add']").prop("outerHTML"));
+            btn.attr("id",btn.data("id")).css("margin-right","5px");
+            toolBtn.before(btn);
+        }
+    }
+
+
 /**
                     rootIdValue: null,//设置根节点id值----可指定根节点，默认为null,"",0,"0"
                     id : "id",               // 选取记录返回的值,用于设置父子关系
@@ -136,9 +154,16 @@
                         align: "left",
                         formatter: function(value,row, index) {
                             var actions = [];
-                            actions.push('<a class="btn btn-success btn-xs " href="javascript:void(0)" onclick="edit(\''+row.id+'\')" ><i class="fa fa-edit"></i>编辑</a> ');
-                            actions.push('<a class="btn btn-primary btn-xs" href="javascript:void(0)" onclick="add(\''+row.id+'\')" ><i class="fa fa-plus"></i>新增</a> ');
-                            actions.push('<a class="btn btn-danger btn-xs" href="javascript:void(0)" onclick="delAll(\''+row.id+'\')" ><i class="fa fa-remove"></i>删除</a>');
+
+                            for(var i=0;i<auth.length;i++){
+                                if("增加" == auth[i].name){
+                                    actions.push('<a class="btn btn-primary btn-xs" href="javascript:void(0)" onclick="add(\''+row.id+'\')" ><i class="fa fa-plus"></i>增加</a> ');
+                                }else if("修改" == auth[i].name){
+                                    actions.push('<a class="btn btn-success btn-xs " href="javascript:void(0)" onclick="edit(\''+row.id+'\')" ><i class="fa fa-edit"></i>修改</a> ');
+                                }else if("删除" == auth[i].name){
+                                    actions.push('<a class="btn btn-danger btn-xs" href="javascript:void(0)" onclick="delAll(\''+row.id+'\')" ><i class="fa fa-remove"></i>删除</a>');
+                                }
+                            }
                             return actions.join('');
                         }
                     }]

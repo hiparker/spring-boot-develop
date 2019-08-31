@@ -86,15 +86,11 @@ public class LoginController extends BaseController{
                     }
 
                     // 复制一个新的菜单集合 循环set 判断其父节点是否存在 不存在的话 就去取一个父节点添加进去
+                    // 递归补全大法
                     List<Menu> authCopy = new ArrayList<>(auth);
-                    for (Menu menu : auth) {
-                        if(null == menuMap.get(menu.getParentId())){
-                            Menu parM = menuService.getMenuMap(menu.getParentId());
-                            if(parM != null){
-                                authCopy.add(menuService.getMenuMap(menu.getParentId()));
-                            }
-                        }
-                    }
+                    menuService.setParentMenu(menuMap,authCopy,auth);
+
+
                     // 去重
                     authCopy = removeDuplicate(authCopy);
                     tree = menuService.getMenuTrees(authCopy);

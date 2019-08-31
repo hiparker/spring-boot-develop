@@ -297,6 +297,28 @@
                 }//end for 次数
             }
         }
+
+        function getAuth(data,href){
+            if(data != null){
+                if(null != data.href && "" != data.href && href.indexOf(data.href) != -1){
+                    return data.children;
+                }else{
+                    if(data.children.length > 0){
+                        for(var i = 0;i<data.children.length;i++){
+                            var menu  = data.children[i];
+                            var auth = getAuth(menu,href);
+                            if(auth != null ){
+                                return auth;
+                            }
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+
+
     </script>
 </head>
 <body>

@@ -180,6 +180,43 @@ public class MenuService extends CrudService<MenuMapper,Menu>{
         }
     }
 
+    public void setParentMenu(Map<String,Menu> menuMapTemp , List<Menu> authCopy,Set<Menu> auth) {
+        int count = 0;
+        for (Menu menu : auth) {
+            if(null == menuMapTemp.get(menu.getParentId())){
+                Menu parM = this.getMenuMap(menu.getParentId());
+                if(parM != null){
+                    authCopy.add(this.getMenuMap(menu.getParentId()));
+                    count ++;
+                }
+            }
+        }
+        //去重复
+        removeDuplicate(authCopy);
+
+        //创建一个KEY（id） 的权限MAP 用于后续快速匹配 避免几何循环
+        Map<String,Menu> menuMapT = new HashMap<>();
+        for (Menu menu : auth) {
+            if(menu != null){
+                menuMapT.put(menu.getId(),menu);
+            }
+        }
+
+        if(count != 0){
+            setParentMenu(menuMapT,authCopy,new HashSet<>(authCopy));
+        }
+    }
+    // 权限去重
+    private List<Menu> removeDuplicate(List<Menu> list)  {
+        for  ( int  i  =   0 ; i  <  list.size()  -   1 ; i ++ )  {
+            for  ( int  j  =  list.size()  -   1 ; j  >  i; j -- )  {
+                if  (list.get(j).getId().equals(list.get(i).getId()))  {
+                    list.remove(j);
+                }
+            }
+        }
+        return list;
+    }
 
 
     public Menu getMenuMap(String key) {
@@ -194,5 +231,6 @@ public class MenuService extends CrudService<MenuMapper,Menu>{
         }
         return null;
     }
+
 
 }

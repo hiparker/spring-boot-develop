@@ -18,6 +18,33 @@
     <script th:src="@{/plugin/layui/layer/layer.js}"></script>
     <script type="text/javascript">
         $(document).ready(function() {
+
+            // 获得权限
+            var auth = top.getAuth(top.authData,location.href);
+
+            // 释放权限
+            var toolBtn = $($("#toolbar").children()[0]);
+            top.listSort(auth);
+            for(var i = 0;i<auth.length;i++){
+                if("增加" == auth[i].name){
+                    var btn = $($(".authBtn").find("[data-id='add']").prop("outerHTML"));
+                    btn.attr("id",btn.data("id")).css("margin-right","5px");
+                    toolBtn.before(btn);
+                }else if("修改" == auth[i].name){
+                    var btn = $($(".authBtn").find("[data-id='edit']").prop("outerHTML"));
+                    btn.attr("id",btn.data("id")).css("margin-right","5px");
+                    toolBtn.before(btn);
+                }else if("删除" == auth[i].name){
+                    var btn = $($(".authBtn").find("[data-id='remove']").prop("outerHTML"));
+                    btn.attr("id",btn.data("id")).css("margin-right","5px");
+                    toolBtn.before(btn);
+                }else if("分配菜单" == auth[i].name){
+                    var btn = $($(".authBtn").find("[data-id='distMenu']").prop("outerHTML"));
+                    btn.attr("id",btn.data("id")).css("margin-right","5px");
+                    toolBtn.before(btn);
+                }
+            }
+
             $('#table').bootstrapTable({
                 //请求方法
                 method: 'post',
@@ -178,56 +205,7 @@
                         sortName: 'remarks'
 
                     }
-                    /*, {
-                        field: 'operate',
-                        title: '操作',
-                        align: 'center',
-                        events: {
-                            'click .view': function (e, value, row, index) {
-                                jp.openViewDialog('查看角色', '${ctx}/sys/role/form?id=' + row.id,'800px', '500px');
-                            },
-                            'click .edit': function (e, value, row, index) {
-                                jp.openSaveDialog('编辑角色', '${ctx}/sys/role/form?id=' + row.id,'800px', '500px');
-                            },
-                            'click .del': function (e, value, row, index) {
-                                del(row.id);
-                            },
-                            'click .auth': function (e, value, row, index) {
-                                jp.openSaveDialog('权限设置', '${ctx}/sys/role/auth?id=' + row.id,'350px', '700px');
-                            },
-                            'click .assign': function (e, value, row, index) {
 
-                                $("#left").attr("class", "col-sm-6");
-                                setTimeout(function(){
-                                    $("#right").fadeIn(500);
-                                },500)
-                                $("#roleLabel").html(row.name);
-                                $("#roleId").val(row.id);
-                                $('#userTable').bootstrapTable("refresh",{query:{id:row.id}})
-                            }
-                        },
-                        formatter:  function operateFormatter(value, row, index) {
-                            return [
-                                <shiro:hasPermission name="sys:role:view">
-                                '<a href="#" class="view" title="查看" ><i class="fa fa-eye"></i> </a>',
-                        </shiro:hasPermission>
-                            <shiro:hasPermission name="sys:role:edit">
-                                <c:if test="${(role.sysData eq fns:getDictValue('是', 'yes_no', '1') && fns:getUser().admin)||!(role.sysData eq fns:getDictValue('是', 'yes_no', '1'))}">
-                                '<a href="#" class="edit" title="修改"><i class="fa fa-edit"></i> </a>',
-                                </c:if>
-                            </shiro:hasPermission>
-                            <shiro:hasPermission name="sys:role:del">
-                                '<a href="#" class="del" title="删除"><i class="fa fa-trash"></i> </a>',
-                        </shiro:hasPermission>
-                            <shiro:hasPermission name="sys:role:assign">
-                                '<a href="#" class="auth"  title="权限设置"><i class="fa fa-cog"></i> </a>',
-                        </shiro:hasPermission>
-                            <shiro:hasPermission name="sys:role:assign">
-                                '<a href="#" class="assign"  title="分配用户"><i class="fa fa-users"></i> </a>'
-                                </shiro:hasPermission>
-                        ].join('');
-                        }
-                    }*/
                 ]
 
             });
@@ -499,10 +477,6 @@
                         }
                     }
 
-                    console.log(ids.length);
-                    var aa = ids.join(",").replace(/u_/ig,"");
-                    console.log(aa.split(",").length);
-                    //return false;
 
                     var indexN = top.layer.msg("正在提交...", {
                         icon: 16
@@ -560,6 +534,21 @@
 
 </head>
 <body>
+    <div class="authBtn" style="display: none">
+        <button data-id="add" class="btn btn-primary btn-xs" onclick="add()">
+            新建
+        </button>
+        <button data-id="edit" class="btn btn-success btn-xs" disabled onclick="edit()">
+            修改
+        </button>
+
+        <button data-id="remove" class="btn btn-danger btn-xs" disabled onclick="delAll()">
+            删除
+        </button>
+        <button data-id="distMenu" class="btn btn-info btn-xs" disabled  onclick="distMenu()">
+            分配菜单
+        </button>
+    </div>
     <div class="wrapper wrapper-content">
         <div class="panel panel-primary">
             <div class="panel-heading">
@@ -569,25 +558,12 @@
                 <!-- 工具栏 -->
                 <div id="toolbar">
 
-                    <button id="add" class="btn btn-primary btn-xs" onclick="add()">
-                        新建
-                    </button>
-
-                    <button id="edit" class="btn btn-success btn-xs" disabled onclick="edit()">
-                        修改
-                    </button>
-
-                    <button id="remove" class="btn btn-danger btn-xs" disabled onclick="delAll()">
-                        删除
-                    </button>
 
                     <button id="refresh" class="btn btn-success btn-xs"  onclick="refresh()">
                         刷新
                     </button>
 
-                    <button id="distMenu" class="btn btn-info btn-xs" disabled  onclick="distMenu()">
-                        分配菜单
-                    </button>
+
 
                     <a class="accordion-toggle btn btn-default btn-xs" data-toggle="collapse"
                        href="#search-collapse">
