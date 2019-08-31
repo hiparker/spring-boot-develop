@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>用户列表</title>
+    <title>角色列表</title>
     <script th:src="@{/plugin/jquery/jquery-3.4.1.min.js}"></script>
     <link rel="stylesheet" th:href="@{/plugin/bootstrap/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/plugin/bootstrap/css/bootstrap-theme.min.css}">
@@ -53,7 +53,7 @@
                 //可供选择的每页的行数（*）
                 pageList: [5, 15, 50, 100],
                 //这个接口需要处理bootstrap table传递的固定参数,并返回特定格式的json数据
-                url: "/a/user/data",
+                url: "/a/role/data",
                 //默认值为 'limit',传给服务端的参数为：limit, offset, search, sort, order Else
                 //queryParamsType:'',
                 ////查询参数,每次调用是会带上这个参数，可自定义
@@ -61,7 +61,7 @@
                     var searchParam = getFormData($("#searchForm"));
                     searchParam.pageNo = params.limit === undefined? "1" :params.offset/params.limit+1;
                     searchParam.pageSize = params.limit === undefined? -1 : params.limit;
-                    searchParam.orderBy = params.sort === undefined? "updateDate DESC" : params.sort+ " "+  params.order;
+                    searchParam.orderBy = params.sort === undefined? "update_date DESC" : params.sort+ " "+  params.order;
                     return searchParam;
                 },
                 //分页方式：client客户端分页，server服务端分页（*）
@@ -83,34 +83,38 @@
                         checkbox: true
                     }
                     ,{
-                        field: 'code',
-                        title: '编号',
-                        sortable: false,
-                        sortName: 'code'
-                    }
-                    ,{
                         field: 'name',
-                        title: '名称',
+                        title: '角色名称',
                         sortable: false,
-                        sortName: 'name'
+                        sortName: 'name',
+                        formatter:function(value, row, index){
+                            return '<a  href="#" onclick="edit(\''+row.id+'\')">'+value+'</a>'
+                        }
                     }
                     ,{
-                        field: 'account',
-                        title: '账号',
-                        sortable: true,
-                        sortName: 'account'
+                        field: 'enname',
+                        title: '英文名称',
+                        sortable: false,
+                        sortName: 'enname'
                     }
                     ,{
-                        field: 'tel',
-                        title: '手机号',
+                        field: 'isSys',
+                        title: '是否系统数据',
                         sortable: true,
-                        sortName: 'tel'
+                        sortName: 'isSys',
+                        formatter:function(value, row , index){
+                            return value=="0" ? '否':'是';
+                        }
+                    }
+                    ,{
+                        field: 'isUseable',
+                        title: '状态',
+                        sortable: true,
+                        sortName: 'isUseable',
+                        formatter:function(value, row , index){
+                            return value=="0" ? '<font color="red">禁用</font>':'<font color="green">正常</font>';
+                        }
 
-                    }
-                    ,{
-                        field: 'roleNames',
-                        title: '角色',
-                        sortable: true
                     }
                     ,{
                         field: 'createBy',
@@ -174,6 +178,56 @@
                         sortName: 'remarks'
 
                     }
+                    /*, {
+                        field: 'operate',
+                        title: '操作',
+                        align: 'center',
+                        events: {
+                            'click .view': function (e, value, row, index) {
+                                jp.openViewDialog('查看角色', '${ctx}/sys/role/form?id=' + row.id,'800px', '500px');
+                            },
+                            'click .edit': function (e, value, row, index) {
+                                jp.openSaveDialog('编辑角色', '${ctx}/sys/role/form?id=' + row.id,'800px', '500px');
+                            },
+                            'click .del': function (e, value, row, index) {
+                                del(row.id);
+                            },
+                            'click .auth': function (e, value, row, index) {
+                                jp.openSaveDialog('权限设置', '${ctx}/sys/role/auth?id=' + row.id,'350px', '700px');
+                            },
+                            'click .assign': function (e, value, row, index) {
+
+                                $("#left").attr("class", "col-sm-6");
+                                setTimeout(function(){
+                                    $("#right").fadeIn(500);
+                                },500)
+                                $("#roleLabel").html(row.name);
+                                $("#roleId").val(row.id);
+                                $('#userTable').bootstrapTable("refresh",{query:{id:row.id}})
+                            }
+                        },
+                        formatter:  function operateFormatter(value, row, index) {
+                            return [
+                                <shiro:hasPermission name="sys:role:view">
+                                '<a href="#" class="view" title="查看" ><i class="fa fa-eye"></i> </a>',
+                        </shiro:hasPermission>
+                            <shiro:hasPermission name="sys:role:edit">
+                                <c:if test="${(role.sysData eq fns:getDictValue('是', 'yes_no', '1') && fns:getUser().admin)||!(role.sysData eq fns:getDictValue('是', 'yes_no', '1'))}">
+                                '<a href="#" class="edit" title="修改"><i class="fa fa-edit"></i> </a>',
+                                </c:if>
+                            </shiro:hasPermission>
+                            <shiro:hasPermission name="sys:role:del">
+                                '<a href="#" class="del" title="删除"><i class="fa fa-trash"></i> </a>',
+                        </shiro:hasPermission>
+                            <shiro:hasPermission name="sys:role:assign">
+                                '<a href="#" class="auth"  title="权限设置"><i class="fa fa-cog"></i> </a>',
+                        </shiro:hasPermission>
+                            <shiro:hasPermission name="sys:role:assign">
+                                '<a href="#" class="assign"  title="分配用户"><i class="fa fa-users"></i> </a>'
+                                </shiro:hasPermission>
+                        ].join('');
+                        }
+                    }*/
                 ]
 
             });
@@ -186,7 +240,7 @@
             $('#table').on('check.bs.table uncheck.bs.table load-success.bs.table ' +
                 'check-all.bs.table uncheck-all.bs.table', function () {
                 $('#remove').prop('disabled', ! $('#table').bootstrapTable('getSelections').length);
-                $('#edit').prop('disabled', $('#table').bootstrapTable('getSelections').length!=1);
+                $('#edit,#distMenu').prop('disabled', $('#table').bootstrapTable('getSelections').length!=1);
             });
 
             $("#search").click("click", function() {// 绑定查询按扭
@@ -224,7 +278,7 @@
                 };
                 params.push(map);
             }
-            top.layer.confirm("是否删除该用户",
+            top.layer.confirm("是否删除该角色",
                 {icon: 3, title:'系统提示', btn: ['是','否'] //按钮
                 }, function(index){
                     var indexN = top.layer.msg("正在删除...", {
@@ -237,7 +291,7 @@
                         headers:{
                             "Content-Type":"application/json"
                         },
-                        url:"/a/user/delAll",
+                        url:"/a/role/delAll",
                         type:"post",
                         data:JSON.stringify(params),
                         success:function(data){
@@ -270,43 +324,37 @@
                 title: "编辑",
                 auto:auto,
                 maxmin: true, //开启最大化最小化按钮
-                content: "/a/user/form?id="+id ,
+                content: "/a/role/form?id="+id ,
                 btn: ['确定', '关闭'],
                 yes: function(index, layero){
                     var iframeWin = layero.find('iframe')[0]; //得到弹出的窗口对象，执行窗口内iframe页的方法：iframeWin.method();
 
-                    var val = iframeWin.contentWindow.getValueJson();
-                    if(val.password != val.valiPassword){
-                        top.layer.alert("密码不一致");
-                        return false;
-                    }
-
                     var flag  = iframeWin.contentWindow.validate();
 
-                    if(flag == true){
+                    if(flag == true) {
+
                         var indexN = top.layer.msg("正在提交...", {
                             icon: 16
-                            ,shade: 0.01,
-                            time:999999999//设置超长时间
+                            , shade: 0.01,
+                            time: 999999999//设置超长时间
                         });
 
                         $.ajax({
-                            url:"/a/user/save",
-                            type:"post",
-                            data:iframeWin.contentWindow.getValue(),
-                            success:function(data){
+                            url: "/a/role/save",
+                            type: "post",
+                            data: iframeWin.contentWindow.getValue(),
+                            success: function (data) {
                                 top.layer.close(indexN);
-                                if(data.success){
+                                if (data.success) {
                                     top.layer.alert(data.msg);
                                     refresh();
-                                }else{
+                                } else {
                                     top.layer.alert(data.msg);
                                 }
                                 top.layer.close(index);
                             }
                         });
                     }
-
                 },
                 cancel: function(index){
                 }
@@ -328,7 +376,7 @@
                 title: "添加",
                 auto:auto,
                 maxmin: true, //开启最大化最小化按钮
-                content: "/a/user/form" ,
+                content: "/a/role/form" ,
                 btn: ['确定', '关闭'],
                 yes: function(index, layero){
                     var iframeWin = layero.find('iframe')[0]; //得到弹出的窗口对象，执行窗口内iframe页的方法：iframeWin.method();
@@ -344,6 +392,7 @@
                     var flag  = iframeWin.contentWindow.validate();
 
                     if(flag == true) {
+
                         var indexN = top.layer.msg("正在提交...", {
                             icon: 16
                             , shade: 0.01,
@@ -351,7 +400,7 @@
                         });
 
                         $.ajax({
-                            url: "/a/user/save",
+                            url: "/a/role/save",
                             type: "post",
                             data: iframeWin.contentWindow.getValue(),
                             success: function (data) {
@@ -397,6 +446,116 @@
             return data;
         }
 
+
+        // 分配菜单
+        function distMenu(id){
+            if(id == undefined){
+                id = getSelections()[0].id;
+            }
+
+            var title = "选择菜单";
+            var url = "/a/menu/treeDataByRoleForm";
+            var checked = true;
+
+            // 正常打开
+            top.layer.open({
+                type: 2,
+                area: ['350px', '520px'],
+                title:title,
+                content: url+"?selectIdFlag="+id,
+                btn: ['确定', '关闭']
+                ,yes: function(index, layero){ //或者使用btn1
+
+                    var tree = layero.find("iframe")[0].contentWindow.tree;//h.find("iframe").contents();
+                    var ids = [], names = [], nodes = [];
+                    if (checked){
+                        nodes = tree.get_checked(true);
+                    }else{
+                        nodes = tree.get_selected(true);
+                    }
+
+                    for(var i=0; i<nodes.length; i++) {
+
+                        // 菜单不过滤父节点
+                        /*if (nodes[i].original.isParent){
+                            continue; // 如果为复选框选择，则过滤掉父节点
+                        }
+
+                        if (nodes[i].original.level == 0){
+                            top.layer.msg("不能选择根节点（"+nodes[i].text+"）请重新选择。", {icon: 0});
+                            return false;
+                        }
+
+                        if (nodes[i].original.isParent){
+                            top.layer.msg("不能选择父节点（"+nodes[i].text+"）请重新选择。", {icon: 0});
+                            return false;
+                        }*/
+
+                        ids.push(nodes[i].id);
+                        names.push(nodes[i].text);//<c:if test="${!checked}">
+
+                        if (!checked){
+                            break; // 如果为非复选框选择，则返回第一个选择  </c:if>
+                        }
+                    }
+
+                    console.log(ids.length);
+                    var aa = ids.join(",").replace(/u_/ig,"");
+                    console.log(aa.split(",").length);
+                    //return false;
+
+                    var indexN = top.layer.msg("正在提交...", {
+                        icon: 16
+                        , shade: 0.01,
+                        time: 999999999//设置超长时间
+                    });
+
+                    $.ajax({
+                        url: "/a/role/saveRoleMenu",
+                        type: "post",
+                        data: {
+                            id:id,
+                            menuIds:ids.join(",").replace(/u_/ig,"")
+                        },
+                        success: function (data) {
+                            top.layer.close(indexN);
+                            if (data.success) {
+                                top.layer.alert(data.msg);
+                                refresh();
+                            } else {
+                                top.layer.alert(data.msg);
+                            }
+                            top.layer.close(index);
+                        }
+                    });
+                    //$("#"+paramsId).val(ids.join(",").replace(/u_/ig,""));
+
+
+                    top.layer.close(index);
+                },
+                cancel: function(index){ //或者使用btn2
+                    //按钮【按钮二】的回调
+                }
+            });
+        }
+
+        // 菜单树
+        $(document).ready(function(){
+
+            var params = "role";
+            var paramsId = "roleIds";
+            var paramsName = "roleNames";
+            var title = "选择角色";
+            var url = "/a/role/treeDataForm";
+            var checked = true;
+
+
+
+
+
+
+
+        })
     </script>
 
 </head>
@@ -404,7 +563,7 @@
     <div class="wrapper wrapper-content">
         <div class="panel panel-primary">
             <div class="panel-heading">
-                <h3 class="panel-title">用户列表</h3>
+                <h3 class="panel-title">角色列表</h3>
             </div>
             <div class="panel-body">
                 <!-- 工具栏 -->
@@ -425,6 +584,11 @@
                     <button id="refresh" class="btn btn-success btn-xs"  onclick="refresh()">
                         刷新
                     </button>
+
+                    <button id="distMenu" class="btn btn-info btn-xs" disabled  onclick="distMenu()">
+                        分配菜单
+                    </button>
+
                     <a class="accordion-toggle btn btn-default btn-xs" data-toggle="collapse"
                        href="#search-collapse">
                         查询条件
@@ -437,16 +601,12 @@
                     <div class="accordion-inner">
                         <form id="searchForm" class="form form-horizontal well clearfix">
                             <div class="col-xs-12 col-sm-6 col-md-4">
-                                <label class="label-item single-overflow pull-left" title="Code：">Code：</label>
-                                <input type="text" name="code" id="code" maxlength="64" class=" form-control"/>
-                            </div>
-                            <div class="col-xs-12 col-sm-6 col-md-4">
-                                <label class="label-item single-overflow pull-left" title="Code：">姓名：</label>
+                                <label class="label-item single-overflow pull-left" title="Code：">角色名称：</label>
                                 <input type="text" name="name" id="name" maxlength="64" class=" form-control"/>
                             </div>
                             <div class="col-xs-12 col-sm-6 col-md-4">
-                                <label class="label-item single-overflow pull-left" title="Code：">账号：</label>
-                                <input type="text" name="account" id="account" maxlength="64" class=" form-control"/>
+                                <label class="label-item single-overflow pull-left" title="Code：">英文名称：</label>
+                                <input type="text" name="enname" id="enname" maxlength="64" class=" form-control"/>
                             </div>
 
                             <div class="col-xs-12 col-sm-6 col-md-4">

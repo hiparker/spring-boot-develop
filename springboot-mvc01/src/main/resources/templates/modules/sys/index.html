@@ -34,7 +34,7 @@
             //响应式
             changeFrameHeight();
             //菜单
-            $.sidebarMenu($('.sidebar-menu'));
+            //$.sidebarMenu($('.sidebar-menu'));
         });
         
         function  userInfo() {
@@ -111,7 +111,192 @@
         
     </script>
     <script>
+        var authData = {};
+        $(function(){
 
+            // 获取权限数据
+            $.ajax({
+                url:"/a/account/getAuth",
+                type:"post",
+                async:false, // 关闭异步
+                success:function(data){
+                    if(data.success){
+                        menuLoading(data.body.param);
+                        authData = data.body.param;
+                        // 默认第二个菜单选中
+                        $($(".nav-menu").find("a")[1]).trigger("click");
+                    }
+                }
+            });
+
+        });
+
+
+
+        // 加载菜单
+        function menuLoading(data) {
+            if (data != null) {
+                // 第一级目录
+                if (data.children.length > 0) {
+                    var html = "";
+                    //排序
+                    listSort(data.children);
+                    for (var i = 0; i < data.children.length; i++) {
+                        var menu = data.children[i];
+                        var count = 0;
+                        for (var j = 0; j < menu.children.length; j++) {
+                            // 不等于2 则为 目录 或者菜单
+                            if(menu.children[j].type != "2"){
+                                count++;
+                                break;
+                            }
+                        }
+
+                        if(menu.type != "2"){
+                            var href = "";
+                            var aname = "";
+                            var childsnum = 0;
+                            if (null != menu.href && "" != menu.href) {
+                                if("/" != menu.href.substr(0,1)){
+                                    href = menu.href;
+                                }else{
+                                    href = "/a" + menu.href;
+                                }
+                            }
+                            if (null != menu.icon && "" != menu.icon) {
+                                aname = "<i class=\""+menu.icon+"\"></i>&nbsp;"+menu.name;
+                            }else{
+                                aname = menu.name;
+                            }
+                            if(menu.children.length > 0 && count != 0){
+                                childsnum = menu.children.length;
+                            }
+
+                            html += "<li><a href=\"javascript:void(0)\" data-type=\"" + menu.type + "\" data-key=\""+menu.id+"\" data-href=\""+href+"\" data-childsnum=\""+childsnum+"\" data-menu=\"parent\" onclick=\"menuClick(this)\" >"+ aname + "</a></li>";
+
+                            var childHtml=  "<ul class=\"sidebar-menu\" data-ulkey=\"menu_ul_"+menu.id+"\" style=\"display: none\">";
+                            // 排序
+                            listSort(menu.children);
+                            for (var k = 0; k < menu.children.length; k++) {
+                                childHtml += recursionMenu(menu.children[k]);
+                            }
+                            childHtml += "</ul>";
+
+                            $(".main-sidebar .sidebar").append(childHtml);
+
+                        }
+                    }
+
+                    //主菜单渲染
+                    $(".nav-menu").append(html);
+                    //子菜单渲染
+                    $.sidebarMenu($('.main-sidebar .sidebar-menu'));
+                }
+            }
+        }
+
+        // 递归循环 子菜单
+        function recursionMenu(data){
+            var html = "";
+            if (data != null) {
+
+                var count = 0;
+                for (var i = 0; i < data.children.length; i++) {
+                    // 不等于2 则为 目录 或者菜单
+                    if(data.children[i].type != "2"){
+                        count++;
+                        break;
+                    }
+                }
+
+                // 下级目录
+                if (data.children.length > 0 && count != 0) {
+                    var menu = data;
+                    if(menu.type != "2") {
+                        var htmlChilds = "";
+                        var href = "";
+                        var aname = "";
+                        if (null != menu.href && "" != menu.href) {
+                            if("/" != menu.href.substr(0,1)){
+                                href = menu.href;
+                            }else{
+                                href = "/a" + menu.href;
+                            }
+                        }
+                        if (null != menu.icon && "" != menu.icon) {
+                            aname = "<i class=\"" + menu.icon + "\"></i>&nbsp;" + menu.name;
+                        } else {
+                            aname = menu.name;
+                        }
+                        htmlChilds += "<li  class=\"treeview\">";
+                        htmlChilds += "<a href=\"javascript:void(0)\" data-type=\"" + menu.type + "\" data-key=\"" + menu.id + "\" data-href=\"" + href + "\" data-childsnum=\"" + data.children.length + "\" data-menu=\"child\" onclick=\"menuClick(this)\" >" + aname + "</a>";
+                        htmlChilds += "<ul class=\"treeview-menu\">";
+                        // 排序
+                        listSort(data.children);
+                        for (var i = 0; i < data.children.length; i++) {
+                            var childsMenu = data.children[i];
+                            // 递归循环子节点
+                            htmlChilds += recursionMenu(childsMenu);
+                        }
+                        htmlChilds += "</ul>";
+                        htmlChilds += "</li>";
+                        html += htmlChilds;
+                    }
+                }else{
+                    var menu = data;
+                    if(menu.type != "2"){
+                        var href = "javascript:void(0)";
+                        var aname = "";
+                        if (null != menu.href && "" != menu.href) {
+                            if("/" != menu.href.substr(0,1)){
+                                href = menu.href;
+                            }else{
+                                href = "/a" + menu.href;
+                            }
+                        }
+                        if (null != menu.icon && "" != menu.icon) {
+                            aname = "<i class=\""+menu.icon+"\"></i>&nbsp;"+"<span>"+menu.name+"</span>";
+                        }else{
+                            aname = "<span>"+menu.name+"</span>";
+                        }
+                        html += "<li><a href=\"javascript:void(0)\" data-type=\"" + menu.type + "\" data-key=\""+menu.id+"\" data-href=\""+href+"\"  data-childsnum=\"0\" data-menu=\"child\" onclick=\"menuClick(this)\">"+ aname + "</a></li>";
+                    }
+                }
+            }
+            return html;
+        }
+
+        function menuClick(dome) {
+           var obj =  $(dome);
+           if("parent" == obj.data("menu")){
+               obj.parent().parent().find("li").removeClass("active");
+               obj.parent().addClass("active");
+               if("0" == obj.data("childsnum") && "2" != obj.data("type")){
+                    $("#main").attr("src",obj.data("href"));
+               }else{
+                    $('.main-sidebar .sidebar-menu').hide();
+                    $("[data-ulkey='menu_ul_"+obj.data("key")+"']").show();
+               }
+           }else if("child" == obj.data("menu")){
+               if("0" == obj.data("childsnum") && "2" != obj.data("type")){
+                   $("#main").attr("src",obj.data("href"));
+               }
+           }
+        }
+
+        // 菜单排序
+        function listSort(data){
+            for ( var i=0;i<data.length-1;i++){
+                //每轮比较次数，次数=长度-1-此时的轮数
+                for (var j=0;j<data.length-1-i;j++) {
+                    if (data[j].sort > data[j + 1].sort) {
+                        var temp = data[j];
+                        data[j] = data[j + 1];
+                        data[j + 1] = temp;
+                    } //end if
+                }//end for 次数
+            }
+        }
     </script>
 </head>
 <body>
@@ -128,15 +313,9 @@
                         <div class="container-fluid">
                             <div>
                                 <!--向左对齐-->
-                                <ul class="nav navbar-nav navbar-left">
+                                <ul class="nav navbar-nav navbar-left nav-menu">
                                     <li class="active">
-                                        <a th:href="@{/account/hello}" target="main">主页</a>
-                                    </li>
-                                    <li>
-                                        <a th:href="@{/user/list}" target="main">用户管理</a>
-                                    </li>
-                                    <li>
-                                        <a th:href="@{/menu/list}" target="main">菜单管理</a>
+                                        <a href="javascript:void(0)" data-type="1" data-key="home" data-href="/a/account/hello"  data-childsnum="0"  data-menu="parent" onclick="menuClick(this)">主页</a>
                                     </li>
                                 </ul>
 
@@ -167,85 +346,7 @@
 
                         <aside class="main-sidebar">
                             <section class="sidebar">
-                                <ul class="sidebar-menu">
-                                    <li>
-                                        <a href="#">
-                                            <i class="fa fa-th"></i> <span>窗口小部件</span>
-                                        </a>
-                                    </li>
-                                    <li class="treeview">
-                                        <a href="#">
-                                            <i class="fa fa-pie-chart"></i>
-                                            <span>图表</span>
-                                            <i class="fa fa-angle-right pull-right"></i>
-                                        </a>
-                                        <ul class="treeview-menu">
-                                            <li><a href="#"><i class="fa fa-circle-o"></i> ChartJS</a></li>
-                                            <li><a href="#"><i class="fa fa-circle-o"></i> Morris</a></li>
-                                            <li><a href="#"><i class="fa fa-circle-o"></i> Flot</a></li>
-                                            <li><a href="#"><i class="fa fa-circle-o"></i> Inline charts</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class="treeview">
-                                        <a href="#">
-                                            <i class="fa fa-laptop"></i>
-                                            <span>UI 元素</span>
-                                            <i class="fa fa-angle-right pull-right"></i>
-                                        </a>
-                                        <ul class="treeview-menu">
-                                            <li><a href="#"><i class="fa fa-circle-o"></i> 一般</a></li>
-                                            <li><a href="#"><i class="fa fa-circle-o"></i> Icons图标</a></li>
-                                            <li><a href="#"><i class="fa fa-circle-o"></i> 按钮</a></li>
-                                            <li><a href="#"><i class="fa fa-circle-o"></i> 滑块</a></li>
-                                            <li><a href="#"><i class="fa fa-circle-o"></i> 时间表</a></li>
-                                            <li><a href="#"><i class="fa fa-circle-o"></i> 模态框</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class="treeview">
-                                        <a href="#">
-                                            <i class="fa fa-edit"></i> <span>表单</span>
-                                            <i class="fa fa-angle-right pull-right"></i>
-                                        </a>
-                                        <ul class="treeview-menu">
-                                            <li><a href="#"><i class="fa fa-circle-o"></i> 一般表单</a></li>
-                                            <li><a href="#"><i class="fa fa-circle-o"></i> 高级表单</a></li>
-                                            <li><a href="#"><i class="fa fa-circle-o"></i> 可编辑表单</a></li>
-                                        </ul>
-                                    </li>
-                                    <li>
-                                        <a href="#">
-                                            <i class="fa fa-envelope"></i> <span>邮箱</span>
-                                            <small class="label pull-right label-warning">12</small>
-                                        </a>
-                                    </li>
-                                    <li class="treeview">
-                                        <a href="#">
-                                            <i class="fa fa-share"></i> <span>多级</span>
-                                            <i class="fa fa-angle-right pull-right"></i>
-                                        </a>
-                                        <ul class="treeview-menu">
-                                            <li><a href="#"><i class="fa fa-circle-o"></i> 一级</a></li>
-                                            <li>
-                                                <a href="#"><i class="fa fa-circle-o"></i> 一级 <i class="fa fa-angle-right pull-right"></i></a>
-                                                <ul class="treeview-menu">
-                                                    <li><a href="#"><i class="fa fa-circle-o"></i> 二级</a></li>
-                                                    <li>
-                                                        <a href="#"><i class="fa fa-circle-o"></i> 二级 <i class="fa fa-angle-right pull-right"></i></a>
-                                                        <ul class="treeview-menu">
-                                                            <li><a href="#"><i class="fa fa-circle-o"></i> 三级</a></li>
-                                                            <li><a href="#"><i class="fa fa-circle-o"></i> 三级</a></li>
-                                                        </ul>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li><a href="#"><i class="fa fa-circle-o"></i> 一级</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class="header">标签</li>
-                                    <li><a href="#"><i class="fa fa-circle-o text-red"></i> <span>重要</span></a></li>
-                                    <li><a href="#"><i class="fa fa-circle-o text-yellow"></i> <span>警告</span></a></li>
-                                    <li><a href="#"><i class="fa fa-circle-o text-aqua"></i> <span>通知</span></a></li>
-                                </ul>
+                                <!--<ul class="sidebar-menu"></ul>-->
                             </section>
                         </aside>
 
@@ -261,12 +362,5 @@
             </div>
 
     </div>
-
-<!--<div class="container-fluid" style="width: 100%">
-    <div class="row-fluid">
-
-    </div>
-
-</div>-->
 </body>
 </html>

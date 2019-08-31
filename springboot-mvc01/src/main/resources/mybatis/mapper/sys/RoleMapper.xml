@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edwin.practive.springbootmvc01.modules.sys.mapper.RoleMapper">
+    
+    <sql id="roleColumns">
+        a.id AS "id",
+        a.name AS "name",
+        a.enname AS "enname",
+        a.is_sys AS "isSys",
+        a.is_useable AS "isUseable",
+        a.create_by AS "createBy",
+        a.create_date AS "createDate",
+        a.update_by AS "updateBy",
+        a.update_date AS "updateDate",
+        a.del_flag AS "delFlag",
+        a.remarks AS "remarks"
+    </sql>
+
+    <sql id="roleJoins">
+
+    </sql>
+
+
+    <select id="get" resultType="Role"  >
+        SELECT
+        <include refid="roleColumns"/>
+        FROM sys_role a
+        <include refid="roleJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+
+    <select id="getRoleMenu" resultType="java.lang.String"  >
+        SELECT
+           a.menu_id AS menuId
+        FROM sys_role_menu a
+        WHERE a.role_id = #{id}
+    </select>
+
+    <select id="findList" resultType="Role" >
+        SELECT
+        <include refid="roleColumns"/>
+        FROM sys_role a
+        <include refid="roleJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="enname != null and enname != ''">
+                AND a.enname = #{enname}
+            </if>
+
+            <if test="name != null and name != ''">
+                AND a.name LIKE
+                <if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+            </if>
+        </where>
+    </select>
+
+    <select id="findAllList" resultType="Role"  >
+        SELECT
+        <include refid="roleColumns"/>
+        FROM airline_ticket_order a
+        <include refid="roleJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO sys_role(
+            id,
+            name,
+            enname,
+            is_sys,
+            is_useable,
+            create_by,
+            create_date,
+            update_by,
+            update_date,
+            del_flag,
+            remarks
+        ) VALUES (
+            #{id},
+            #{name},
+            #{enname},
+            #{isSys},
+            #{isUseable},
+            #{createBy},
+            #{createDate},
+            #{updateBy},
+            #{updateDate},
+            #{delFlag},
+            #{remarks}
+        )
+    </insert>
+
+    <insert id="insertRoleMenu">
+        INSERT INTO sys_role_menu(
+            id,
+            role_id,
+            menu_id
+        ) VALUES (
+            #{id},
+            #{roleId},
+            #{menuId}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE sys_role SET
+        name = #{name},
+        enname = #{enname},
+        is_sys = #{isSys},
+        is_useable = #{isUseable},
+        update_by = #{updateBy},
+        update_date = #{updateDate},
+        remarks = #{remarks}
+        WHERE id = #{id}
+    </update>
+
+    <!--物理删除-->
+    <delete id="delete">
+        DELETE FROM sys_role
+        WHERE id = #{id}
+    </delete>
+
+    <!-- 删除角色与菜单 -->
+    <delete id="deleteRoleMenu">
+        DELETE FROM sys_role_menu
+        WHERE role_id = #{id}
+    </delete>
+    <!-- 删除角色与用户配置 -->
+    <delete id="deleteRoleUser">
+        DELETE FROM sys_user_role
+        WHERE role_id = #{id}
+    </delete>
+
+    <!--逻辑删除-->
+    <update id="deleteByLogic">
+        UPDATE sys_role SET
+        del_flag = #{DEL_FLAG_DELETE}
+        WHERE id = #{id}
+    </update>
+
+
+    <!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+    <select id="findUniqueByProperty" resultType="Role"  statementType="STATEMENT">
+        select * FROM sys_role  where ${propertyName} = '${value}'
+    </select>
+
+</mapper>

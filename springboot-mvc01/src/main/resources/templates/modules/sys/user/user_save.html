@@ -47,17 +47,128 @@
         function getValueJson(){
             return getFormData($('#inputForm'));
         }
+        function validateForm(id) {  //id
+            return $(id).validate({
+                errorPlacement: function(error, element) {
+                    if (element.is(":checkbox")||element.is(":radio")){
+                        error.appendTo(element.parent().parent().parent().parent());
+                    }else  if (element.parent().is(".form_datetime") ||element.parent().is(".input-append") || element.is(".mydatepicker")){
+                        error.appendTo(element.parent().parent());
+                    }else{
+                        error.insertAfter(element);
+                    }
+                }
+            }).form();
+        }
+        function validate() {
+            var isValidate = validateForm('#inputForm');//校验表单
+            if(!isValidate){
+                return false;
+            }
+            return true;
+        }
+
+
+        // 角色树
+        $(document).ready(function(){
+
+            var params = "role";
+            var paramsId = "roleIds";
+            var paramsName = "roleNames";
+            var title = "选择角色";
+            var url = "/a/role/treeDataForm";
+            var checked = true;
+
+            if ($("#"+params+"Button").hasClass("disabled")){
+                $("#"+params+"DelButton").hide();
+            }else{
+                $("#"+paramsName).css("background","#FFFFFF");
+                $("#"+params+"DelButton").show();
+            }
+            $("#"+params+"Button, #"+paramsName).click(function(){
+
+                // 是否限制选择，如果限制，设置为disabled
+                if ($("#"+params+"Button").hasClass("disabled")){
+                    return true;
+                }
+
+
+                // 正常打开
+                top.layer.open({
+                    type: 2,
+                    area: ['300px', '420px'],
+                    title:title,
+                    content: url+"?selectIdFlag="+$("#userId").val(),
+                    btn: ['确定', '关闭']
+                    ,yes: function(index, layero){ //或者使用btn1
+
+                        var tree = layero.find("iframe")[0].contentWindow.tree;//h.find("iframe").contents();
+                        var ids = [], names = [], nodes = [];
+                        if (checked){
+                            nodes = tree.get_checked(true);
+                        }else{
+                            nodes = tree.get_selected(true);
+                        }
+
+                        for(var i=0; i<nodes.length; i++) {
+                            if (nodes[i].original.isParent){
+                                continue; // 如果为复选框选择，则过滤掉父节点
+                            }
+
+                            if (nodes[i].original.level == 0){
+                                top.layer.msg("不能选择根节点（"+nodes[i].text+"）请重新选择。", {icon: 0});
+                                return false;
+                            }
+
+                            if (nodes[i].original.isParent){
+                                top.layer.msg("不能选择父节点（"+nodes[i].text+"）请重新选择。", {icon: 0});
+                                return false;
+                            }
+
+                            ids.push(nodes[i].id);
+                            names.push(nodes[i].text);//<c:if test="${!checked}">
+
+                            if (!checked){
+                                break; // 如果为非复选框选择，则返回第一个选择  </c:if>
+                            }
+                        }
+
+                        $("#"+paramsId).val(ids.join(",").replace(/u_/ig,""));
+                        $("#"+paramsName).val(names.join(","));
+                        $("#"+paramsName).focus();
+
+                        top.layer.close(index);
+                    },
+                    cancel: function(index){ //或者使用btn2
+                        //按钮【按钮二】的回调
+                    }
+                });
+
+            });
+
+            $("#"+params+"DelButton").click(function(){
+                // 是否限制选择，如果限制，设置为disabled
+                if ($("#"+params+"Button").hasClass("disabled")){
+                    return true;
+                }
+                // 清除
+                $("#"+paramsId).val("");
+                $("#"+paramsName).val("");
+                $("#"+paramsName).focus();
+
+            });
+        })
     </script>
 </head>
 <body>
 <div class="container">
     <div class="row">
         <form id="inputForm" th:object="${user}" class="form-horizontal form-group">
-            <input type="hidden" th:field="*{id}" >
+            <input type="hidden" id="userId" th:field="*{id}" >
             <input type="hidden" th:field="*{sysversion}">
             <table class="table table-bordered">
                 <tr>
-                    <th class="width-15 active"><label class="pull-right"><font color="red">*</font> 用户Code:</label></th>
+                    <th class="width-15 active"><label class="pull-right"><font color="red">*</font> 用户编号</label></th>
                     <td class="width-35">
                         <input type="text" th:field="*{code}" class="form-control required" >
                     </td>
@@ -88,6 +199,16 @@
                     </td>
                 </tr>
                 <tr>
+                    <th class="width-15 active"><label class="pull-right">角色</label></th>
+                    <td  class="width-35">
+                        <input id="roleIds" name="roleIds" type="hidden" th:value="${user.roleIds}"/>
+                        <div class="input-group" style="width: 100%">
+                            <input id="roleNames"  name="roleNames"  type="text" th:value="${user.roleNames}" class="form-control required" />
+                            <span class="input-group-btn">
+                                 <button type="button" id="roleDelButton" class="close" data-dismiss="alert" style="position: absolute; top: 5px; right: 20px; z-index: 999; display: block;">×</button>
+                            </span>
+                        </div>
+                    </td>
                     <th class="width-15 active"><label class="pull-right">备注</label></th>
                     <td  class="width-35">
                         <input type="text"  th:field="*{remarks}" maxlength="100" class="form-control">

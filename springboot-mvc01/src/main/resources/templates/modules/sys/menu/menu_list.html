@@ -19,12 +19,6 @@
 </head>
 <body>
     <div id="menu-toolbar"  class="btn-group-toggle" data-toggle="buttons">
-      <!--<button id="addBtn" type="button" class="btn btn-secondary">向表格添加数据</button>
-      <button id="selectBtn" type="button" class="btn btn-secondary">测试选中</button>
-      <button id="expandRowBtn" type="button" class="btn btn-secondary">展开/折叠【系统管理】</button>
-      <button id="expandAllBtn" type="button" class="btn btn-secondary">展开/折叠 所有</button>
-      <button id="showColumnBtn" type="button" class="btn btn-secondary">显示/隐藏 【排序】列</button>
-      <button id="destroyBtn" type="button" class="btn btn-secondary">销毁</button>-->
       <button type="button" class="btn btn-primary btn-sm" onclick="add()" title="新建"><i class="glyphicon glyphicon-plus"></i> 新建</button>
       <button type="button" class="btn btn-default btn-sm" onclick="refresh()" title="刷新"><i class="glyphicon glyphicon-repeat"></i> 刷新</button>
     </div>
@@ -64,6 +58,7 @@
                     expanderCollapsedClass : "fa fa-angle-right",
                     showColumns: false,
                     showRefresh: false,
+                    expandAll:true,
                     parentId:"parentId",
                     ajaxParams:{},
                     type:"get",
@@ -124,11 +119,9 @@
                         title: '可见',
                         width: '10%',
                         align: "left",
-                        visible: false,
                         formatter: function(value,row, index) {
-                            // TODO isShow 名称关键词 重复
-
-                            return value;
+                            //  isShow 名称关键词 重复
+                            return value == "1" ? '<i class="fa fa-circle text-success ml5"></i>' : '<i class="fa fa-circle text-muted ml5"></i>';
                         }
                     },
                     {
@@ -258,7 +251,7 @@
                         });
                 }
 
-                //修改
+                //添加
                 function add(id){
 
                     var width = "800px",height="500px";

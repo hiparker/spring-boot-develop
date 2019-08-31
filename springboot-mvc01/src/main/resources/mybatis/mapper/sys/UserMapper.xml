@@ -12,16 +12,20 @@
 
         a.is_useable AS "isUseable",
         a.sysversion AS "sysversion",
-        a.create_by AS "createBy.id",
+        a.create_by AS "createBy",
         a.create_date AS "createDate",
-        a.update_by AS "updateBy.id",
+        a.update_by AS "updateBy",
         a.update_date AS "updateDate",
         a.del_flag AS "delFlag",
-        a.remarks AS "remarks"
+        a.remarks AS "remarks",
+
+        GROUP_CONCAT(r.id) AS roleIds,
+        GROUP_CONCAT(r.name) AS roleNames
     </sql>
 
     <sql id="userJoins">
-
+        LEFT JOIN sys_user_role ur ON ur.user_id = a.id
+        LEFT JOIN sys_role r ON ur.role_id = r.id
     </sql>
 
 
@@ -31,7 +35,9 @@
         FROM sys_user a
         <include refid="userJoins"/>
         WHERE a.id = #{id}
+        GROUP BY a.id
     </select>
+
 
     <select id="validataLogin" resultType="User"  >
         SELECT
@@ -39,6 +45,7 @@
         FROM sys_user a
         <include refid="userJoins"/>
         WHERE a.account = #{account} and password = #{password}
+        GROUP BY a.id
     </select>
 
 
@@ -58,14 +65,17 @@
             <if test="password != null and password != ''">
                 AND a.password = #{password}
             </if>
-
             <if test="name != null and name != ''">
                 AND a.user_name LIKE
                 <if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
                 <if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
                 <if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
             </if>
+            <if test="!isAdmin">
+                AND a.id != '0'
+            </if>
         </where>
+        GROUP BY a.id
     </select>
 
     <select id="findAllList" resultType="User"  >
@@ -76,6 +86,7 @@
         <where>
             a.del_flag = #{DEL_FLAG_NORMAL}
         </where>
+        GROUP BY a.id
     </select>
 
     <insert id="insert">
@@ -109,6 +120,18 @@
             #{updateDate},
             #{delFlag},
             #{remarks}
+        )
+    </insert>
+
+    <insert id="insertUserRole">
+        INSERT INTO sys_user_role(
+            id,
+            user_id,
+            role_id
+        ) VALUES (
+            #{id},
+            #{userId},
+            #{roleId}
         )
     </insert>
 
@@ -147,6 +170,12 @@
     <delete id="delete">
         DELETE FROM sys_user
         WHERE id = #{id}
+    </delete>
+
+    <!-- 删除用户与角色 -->
+    <delete id="deleteUserRole">
+        DELETE FROM sys_user_role
+        WHERE user_id = #{id}
     </delete>
 
     <!--逻辑删除-->

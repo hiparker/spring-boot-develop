@@ -22,4 +22,6 @@ public interface MenuMapper extends BaseMapper<Menu> {
 	
 	public int updateSort(Menu menu);
 
+    int deleteRoleMenu(Menu menu);
+
 }

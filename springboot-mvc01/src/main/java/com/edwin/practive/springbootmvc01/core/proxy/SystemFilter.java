@@ -1,6 +1,8 @@
 package com.edwin.practive.springbootmvc01.core.proxy;
 
 import com.edwin.practive.springbootmvc01.common.utils.PropertiesUtil;
+import com.edwin.practive.springbootmvc01.common.utils.StringUtils;
+import com.edwin.practive.springbootmvc01.modules.sys.entity.Menu;
 import com.edwin.practive.springbootmvc01.modules.sys.entity.User;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +22,7 @@ import java.util.List;
 @WebFilter(urlPatterns = "/")
 public class SystemFilter implements Filter{
     private static final String LOGIN_URI = "/account/login";
-    private static final String[] IGNORE_URI = {"/account/login","/account/index"};
+    private static final String[] IGNORE_URI = {"/account/login","/account/index","/account/getAuth","/account/hello"};
     private static List<String> file_ends;
 
     static{
@@ -65,13 +67,20 @@ public class SystemFilter implements Filter{
             }
         }
 
+
+        boolean flagUri = validataAuthUri(user.getMenuAll(),user.getMenus(),uri);
+        if(!flagUri){
+            response.sendRedirect("/a/account/index");
+            return;
+        }
+
         //放行
         filterChain.doFilter(request,response);
     }
 
     public boolean validataFileUri(String uri){
         for (String fileEnd : file_ends) {
-            if(uri.endsWith(fileEnd)){
+            if(uri.indexOf(fileEnd) != -1){
                 return true;
             }
         }
@@ -80,11 +89,37 @@ public class SystemFilter implements Filter{
 
     public boolean validataUri(String uri){
         for (String uriTemp : IGNORE_URI) {
-            if(uri.endsWith(uriTemp)){
+            if(uri.indexOf(uriTemp) != -1){
                 return true;
             }
         }
         return false;
+    }
+
+    // 拦截 访问地址在 数据库监控菜单范围内 并且又不再个人权限内的请求
+    public boolean validataAuthUri(List<Menu> menuAll,List<Menu> menus, String uri){
+
+        boolean flag = false;
+        for (Menu menu : menuAll) {
+            if(!StringUtils.isEmpty(menu.getHref())){
+                if(uri.indexOf(menu.getHref()) != -1){
+                    flag = true;
+                }
+            }
+        }
+
+        if(!flag){
+            return true;
+        }else{
+            for (Menu menu : menus) {
+                if(!StringUtils.isEmpty(menu.getHref())){
+                    if(uri.indexOf(menu.getHref()) != -1){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
     }
 
     @Override

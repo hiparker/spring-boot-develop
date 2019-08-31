@@ -23,7 +23,7 @@ public class Menu extends DataEntity<Menu> {
 	private Menu parent;	// 父级菜单
     private String parentId; // 父级编号
 	private String parentIds; // 所有父级编号
-	private List<Menu> children;	// 父级菜单
+	private List<Menu> children;	// 子菜单
 	private String name; 	// 名称
 	private String href; 	// 链接
 	private String target; 	// 目标（ mainFrame、_blank、_self、_parent、_top）

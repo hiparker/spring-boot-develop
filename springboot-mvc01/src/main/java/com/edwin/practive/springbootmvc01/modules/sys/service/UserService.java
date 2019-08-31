@@ -1,6 +1,7 @@
 package com.edwin.practive.springbootmvc01.modules.sys.service;
 
 import com.edwin.practive.springbootmvc01.common.json.AjaxJson;
+import com.edwin.practive.springbootmvc01.common.utils.IdGen;
 import com.edwin.practive.springbootmvc01.common.utils.PropertiesUtil;
 import com.edwin.practive.springbootmvc01.common.utils.StringUtils;
 import com.edwin.practive.springbootmvc01.common.utils.misc.AESUtil;
@@ -18,6 +19,8 @@ import java.util.List;
 //@Transactional(readOnly = true)
 public class UserService extends CrudService<UserMapper,User>{
 
+    private final static String YES = "1";
+    private final static String NO = "0";
 
     /**
      * 检查密码
@@ -63,7 +66,6 @@ public class UserService extends CrudService<UserMapper,User>{
     //@Transactional(readOnly = false)
     @Override
     public int save(User user){
-
         if(StringUtils.isEmpty(user.getPassword())){
             user.setPassword(this.get(user).getPassword());
         }else{
@@ -71,7 +73,18 @@ public class UserService extends CrudService<UserMapper,User>{
             String encyPassword = AESUtil.encrypt(user.getPassword(), PropertiesUtil.getConfig("aeskey"));
             user.setPassword(encyPassword);
         }
-        return super.save(user);
+
+        int count = super.save(user);
+
+        // 删除用户角色
+        mapper.deleteUserRole(user);
+        // 添加用户角色
+        String[] roleids = user.getRoleIds().split(",");
+        for (String roleid : roleids) {
+            mapper.insertUserRole(IdGen.uuid(),user.getId(),roleid);
+        }
+
+        return count;
     }
 
 
@@ -82,11 +95,15 @@ public class UserService extends CrudService<UserMapper,User>{
      */
     //@Transactional(readOnly = false)
     public int remove(User user){
+        // 删除用户角色
+        mapper.deleteUserRole(user);
         return super.delete(user);
     }
     public int remove(String id){
         User user = new User();
         user.setId(id);
+        // 删除用户角色
+        mapper.deleteUserRole(user);
         return super.delete(user);
     }
 
@@ -113,7 +130,7 @@ public class UserService extends CrudService<UserMapper,User>{
 
 
     /**
-     * 批量查询
+     * 查询
      * @param user
      * @return
      */

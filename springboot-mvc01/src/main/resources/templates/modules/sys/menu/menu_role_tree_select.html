@@ -35,11 +35,11 @@
                     "animation" : 0,
                     "themes" : { "icons":true ,"stripes":false},
                     'data' : {
-                        "url" : "/a/menu/treeData?tm="+ new Date().getTime()+"&selectIdFlag=[[${selectIdFlag}]]",
+                        "url" : "/a/menu/treeByRoleData?tm="+ new Date().getTime()+"&selectIdFlag=[[${selectIdFlag}]]",
                         "dataType" : "json" // needed only if you do not supply JSON headers
                     }
                 },
-                'plugins' : ['types' ,"search", 'wholerow'],
+                'plugins' : ['types' ,"checkbox", 'wholerow'],
                 "types":{
                     'default' : { 'icon' : 'fa fa-folder' },
                     '1' : {'icon' : 'fa fa-home'},
@@ -47,6 +47,11 @@
                     '3' : { 'icon' : 'fa fa-group'},
                     '4' : { 'icon' : 'fa fa-eur' },
                     'btn':{'icon' : 'fa fa-square'}
+                },
+                'checkbox' : {
+                    // 禁用级联选中
+                    'three_state' : false,
+                    'cascade' : 'undetermined|down|up' //有三个选项，up, down, undetermined; 使用前需要先禁用three_state
                 }
 
             });

@@ -134,11 +134,11 @@ public abstract class DataEntity<T> extends BaseEntity<T> {
         this.sysversion = sysversion;
     }
 
-    public Boolean getUseable() {
+    public Boolean getIsUseable() {
         return isUseable;
     }
 
-    public void setUseable(Boolean useable) {
-        isUseable = useable;
+    public void setIsUseable(Boolean isUseable) {
+        this.isUseable = isUseable;
     }
 }

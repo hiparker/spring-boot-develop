@@ -16,9 +16,9 @@
 		a.menu_type AS "type",
 		a.permission AS "permission",
 		a.remarks AS "remarks",
-		a.create_by AS "createBy.id",
+		a.create_by AS "createBy",
 		a.create_date AS "createDate",
-		a.update_by AS "updateBy.id",
+		a.update_by AS "updateBy",
 		a.update_date AS "updateDate",
 		a.del_flag AS "delFlag"
 	</sql>
@@ -122,6 +122,12 @@
 					<if test="dbName == 'mysql'">CONCAT('%,', #{id}, ',%')</if>
 					<if test="dbName == 'mssql'">'%'+#{id}+'%'</if>
 	</update>
+
+    <!-- 删除角色与菜单 -->
+    <delete id="deleteRoleMenu">
+        DELETE FROM sys_role_menu
+        WHERE menu_id = #{id}
+    </delete>
 
 	<update id="deleteByLogic">
 		UPDATE sys_menu SET 

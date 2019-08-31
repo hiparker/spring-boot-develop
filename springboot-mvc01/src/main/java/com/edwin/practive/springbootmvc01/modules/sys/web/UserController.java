@@ -48,9 +48,6 @@ public class UserController extends BaseController{
 
     @RequestMapping("form")
     public String form(User user,ModelMap map){
-
-       String aa =  PropertiesUtil.getConfig("aeskey");
-
         map.addAttribute("user",user);
         return "modules/sys/user/user_save";
     }
@@ -83,7 +80,12 @@ public class UserController extends BaseController{
 
     @RequestMapping("data")
     @ResponseBody
-    public Map<String, Object> data(Page page, User user, ModelMap map){
+    public Map<String, Object> data(HttpServletRequest request,Page page, User user, ModelMap map){
+        User sessionUser = (User) request.getSession().getAttribute("user");
+        // 超级管理员
+        if("0".equals(sessionUser.getId())){
+            user.setAdmin(true);
+        }
         //简单分页
         Page pageInfo = userService.findPage(page,user);
         return getBootstrapData(pageInfo);
@@ -118,7 +120,16 @@ public class UserController extends BaseController{
             idArray[i] = list.get(i).get("id");
         }
 
+
+
         for(String id : idArray){
+            // 超级管理员ID
+            if("0".equals(id)){
+                j.setMsg("超级管理员不可删除！");
+                j.setSuccess(false);
+                return j;
+            }
+
             userService.remove(id);
         }
         j.setMsg("删除成功");

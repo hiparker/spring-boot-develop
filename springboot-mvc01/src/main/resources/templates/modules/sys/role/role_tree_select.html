@@ -2,7 +2,7 @@
 <html lang="en"  xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>菜单树选择</title>
+    <title>角色树选择</title>
     <script th:src="@{/plugin/jquery/jquery-3.4.1.min.js}"></script>
     <link rel="stylesheet" th:href="@{/plugin/bootstrap/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/plugin/bootstrap/css/bootstrap-theme.min.css}">
@@ -35,20 +35,19 @@
                     "animation" : 0,
                     "themes" : { "icons":true ,"stripes":false},
                     'data' : {
-                        "url" : "/a/menu/treeData?tm="+ new Date().getTime()+"&selectIdFlag=[[${selectIdFlag}]]",
+                        "url" : "/a/role/treeData?tm="+ new Date().getTime()+"&selectIdFlag=[[${selectIdFlag}]]",
                         "dataType" : "json" // needed only if you do not supply JSON headers
                     }
                 },
-                'plugins' : ['types' ,"search", 'wholerow'],
+                'plugins' : ['types' ,"checkbox", 'wholerow'],
                 "types":{
-                    'default' : { 'icon' : 'fa fa-folder' },
-                    '1' : {'icon' : 'fa fa-home'},
-                    '2' : {'icon' : 'fa fa-umbrella' },
-                    '3' : { 'icon' : 'fa fa-group'},
-                    '4' : { 'icon' : 'fa fa-eur' },
-                    'btn':{'icon' : 'fa fa-square'}
+                    'default' : { 'icon' : 'fa fa-user' }
+                },
+                'checkbox' : {
+                    // 禁用级联选中
+                    'three_state' : false,
+                    'cascade' : 'undetermined|down|up' //有三个选项，up, down, undetermined; 使用前需要先禁用three_state
                 }
-
             });
 
             tree = $('#jstree').jstree(true);
@@ -56,7 +55,7 @@
     </script>
 
 </head>
-<body>
+<body style="overflow-x: auto">
     <div class="row">
         <div id="jstree" ></div>
     </div>
